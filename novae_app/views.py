@@ -204,35 +204,52 @@ from .models import AssignmentInstance, StudentAnswer
 
 @login_required
 def student_assignment_detail(request, instance_id):
+    """
+    View for students to view and submit an assignment.
+    Correctly calculates score and marks assignment as completed.
+    """
     student = request.user.student_profile
     instance = get_object_or_404(AssignmentInstance, id=instance_id, student=student)
     questions = instance.assignment.questions.all()
 
-    # Fetch all student answers for this assignment instance
+    # Fetch existing answers for this student/assignment
     student_answers = StudentAnswer.objects.filter(
         assignment_instance=instance,
         question__in=questions
     ).select_related('question')
-
-    # Dictionary: {question.id: StudentAnswer}
-    answers_by_question_id = {answer.question.id: answer for answer in student_answers}
+    answers_by_question_id = {ans.question.id: ans for ans in student_answers}
 
     if request.method == 'POST':
-        for question in questions:
-            answer_text = request.POST.get(f'question_{question.id}')
-            if question.question_type == 'TEXT' and answer_text:
-                StudentAnswer.objects.update_or_create(
-                    assignment_instance=instance,
-                    question=question,
-                    defaults={'text_answer': answer_text, 'student': student}
-                )
-            elif question.question_type == 'MC' and answer_text:
-                StudentAnswer.objects.update_or_create(
-                    assignment_instance=instance,
-                    question=question,
-                    defaults={'selected_option': answer_text, 'student': student}
-                )
+        total_questions = questions.count()
+        correct_answers = 0
 
+        for question in questions:
+            # Get submitted answer from POST
+            answer_text = request.POST.get(f'question_{question.id}', '').strip()
+
+            # Update or create StudentAnswer
+            student_answer, _ = StudentAnswer.objects.update_or_create(
+                assignment_instance=instance,
+                question=question,
+                student=student
+            )
+
+            if question.question_type == 'TEXT':
+                student_answer.text_answer = answer_text
+                # Check correctness (case-insensitive)
+                if answer_text.lower() == (question.correct_answer or '').strip().lower():
+                    correct_answers += 1
+            elif question.question_type == 'MC':
+                student_answer.selected_option = answer_text
+                # Check correctness
+                if answer_text == question.correct_option:
+                    correct_answers += 1
+
+            student_answer.save()
+
+        # Calculate percentage score
+        score_percent = (correct_answers / total_questions) * 100 if total_questions > 0 else 0
+        instance.score = score_percent
         instance.completed = True
         instance.save()
 
@@ -241,9 +258,8 @@ def student_assignment_detail(request, instance_id):
     return render(request, 'novae_app/assignment_detail.html', {
         'instance': instance,
         'questions': questions,
-        'answers_by_question_id': answers_by_question_id,  # renamed for clarity
+        'answers_by_question_id': answers_by_question_id,
     })
-
 # ---------------------------
 
 
