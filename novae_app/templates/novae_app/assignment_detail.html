@@ -1,5 +1,3 @@
-{% load custom_filters %}
-
 <h1>{{ instance.assignment.title }}</h1>
 <p>Due Date: {{ instance.assignment.due_date }}</p>
 
@@ -13,22 +11,24 @@
             <li>
                 <p><strong>{{ question.question_text }}</strong></p>
 
-                {% with answer=answers_dict|dict_get:question.id %}
-                    {% if question.is_text_answer %}
-                        <p>Your Answer: {{ answer.text_answer|default:"Not answered" }}</p>
-                        {% if answer.is_correct %}
-                            <span style="color:green">Correct ✅</span>
+                {% with answer=answers_by_question_id|default:{} %}
+                    {% with answer=answer|get_item:question.id %}
+                        {% if question.is_text_answer %}
+                            <p>Your Answer: {{ answer.text_answer|default:"Not answered" }}</p>
+                            {% if answer.is_correct %}
+                                <span style="color:green">Correct ✅</span>
+                            {% else %}
+                                <span style="color:red">Incorrect ❌</span>
+                            {% endif %}
                         {% else %}
-                            <span style="color:red">Incorrect ❌</span>
+                            <p>Your Answer: {{ answer.selected_option|default:"Not answered" }}</p>
+                            {% if answer.is_correct %}
+                                <span style="color:green">Correct ✅</span>
+                            {% else %}
+                                <span style="color:red">Incorrect ❌</span>
+                            {% endif %}
                         {% endif %}
-                    {% else %}
-                        <p>Your Answer: {{ answer.selected_option|default:"Not answered" }}</p>
-                        {% if answer.is_correct %}
-                            <span style="color:green">Correct ✅</span>
-                        {% else %}
-                            <span style="color:red">Incorrect ❌</span>
-                        {% endif %}
-                    {% endif %}
+                    {% endwith %}
                 {% endwith %}
             </li>
         {% endfor %}
