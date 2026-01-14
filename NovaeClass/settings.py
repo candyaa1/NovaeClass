@@ -29,7 +29,10 @@ DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS","127.0.0.1", "localhost ,localhost,novaeclass.onrender.com,www.novaeclass.com").split(",")
+ALLOWED_HOSTS = os.environ.get(
+    "DJANGO_ALLOWED_HOSTS",
+    "127.0.0.1,localhost,novaeclass.onrender.com,www.novaeclass.com"
+).split(",")
 
 # Application definition
 
