@@ -1,5 +1,5 @@
 {% load static %}
-{% load extras %} {# make sure this loads dict_get #}
+{% load custom_filters %}  {# <-- load your actual custom filter file #}
 
 {% block title %}{{ instance.assignment.title }}{% endblock %}
 
