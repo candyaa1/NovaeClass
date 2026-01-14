@@ -10,26 +10,31 @@
         {% for item in assignments %}
           <li>
             <div>
-              {% if not item.locked %}
-                <a href="{% url 'student_assignment_detail' instance_id=item.instance.id %}">
-                  <strong>{{ item.instance.assignment.title }}</strong>
-                </a>
+              {% if item.instance and item.instance.id %}
+                {% if not item.locked %}
+                  <a href="{% url 'student_assignment_detail' instance_id=item.instance.id %}">
+                    <strong>{{ item.instance.assignment.title }}</strong>
+                  </a>
+                {% else %}
+                  <strong>{{ item.instance.assignment.title }} 🔒</strong>
+                {% endif %}
+                — Due <time datetime="{{ item.instance.assignment.due_date }}">{{ item.instance.assignment.due_date }}</time>
               {% else %}
-                <strong>{{ item.instance.assignment.title }} 🔒</strong>
+                <strong>Assignment data unavailable</strong>
               {% endif %}
-              — Due <time datetime="{{ item.instance.assignment.due_date }}">{{ item.instance.assignment.due_date }}</time>
             </div>
 
-            {% if not item.locked %}
-              <button class="btn-ai-suggest" onclick="showAIHelp('{{ item.instance.assignment.title }}')">🤖 AI Help</button>
-            {% endif %}
+            {% if item.instance and item.instance.id %}
+              {% if not item.locked %}
+                <button class="btn-ai-suggest" onclick="showAIHelp('{{ item.instance.assignment.title }}')">🤖 AI Help</button>
+              {% endif %}
 
-            <!-- Retake button for students who scored < 75 -->
-            {% if item.can_retake %}
-              <form method="post" action="{% url 'student_assignment_retake' instance_id=item.instance.id %}" style="margin-top: 8px;">
-                {% csrf_token %}
-                <button type="submit" class="btn-ai-suggest">🔄 Retake Assignment</button>
-              </form>
+              {% if item.can_retake %}
+                <form method="post" action="{% url 'student_assignment_retake' instance_id=item.instance.id %}" style="margin-top: 8px;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-ai-suggest">🔄 Retake Assignment</button>
+                </form>
+              {% endif %}
             {% endif %}
           </li>
         {% endfor %}
