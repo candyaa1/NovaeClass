@@ -11,30 +11,32 @@
           <li>
             <div>
               {% if item.instance and item.instance.id %}
-                {% if not item.locked %}
-                  <a href="{% url 'student_assignment_detail' instance_id=item.instance.id %}">
-                    <strong>{{ item.instance.assignment.title }}</strong>
-                  </a>
-                {% else %}
-                  <strong>{{ item.instance.assignment.title }} 🔒</strong>
-                {% endif %}
-                — Due <time datetime="{{ item.instance.assignment.due_date }}">{{ item.instance.assignment.due_date }}</time>
+                  {% if item.completed %}
+                      <strong>{{ item.instance.assignment.title }} ✅</strong>
+                  {% elif item.locked %}
+                      <strong>{{ item.instance.assignment.title }} 🔒</strong>
+                  {% else %}
+                      <a href="{% url 'student_assignment_detail' instance_id=item.instance.id %}">
+                        <strong>{{ item.instance.assignment.title }}</strong>
+                      </a>
+                  {% endif %}
+                  — Due <time datetime="{{ item.instance.assignment.due_date }}">{{ item.instance.assignment.due_date }}</time>
               {% else %}
-                <strong>Assignment data unavailable</strong>
+                  <strong>Assignment data unavailable</strong>
               {% endif %}
             </div>
 
             {% if item.instance and item.instance.id %}
-              {% if not item.locked %}
-                <button class="btn-ai-suggest" onclick="showAIHelp('{{ item.instance.assignment.title }}')">🤖 AI Help</button>
-              {% endif %}
+                {% if not item.locked and not item.completed %}
+                    <button class="btn-ai-suggest" onclick="showAIHelp('{{ item.instance.assignment.title }}')">🤖 AI Help</button>
+                {% endif %}
 
-              {% if item.can_retake %}
-                <form method="post" action="{% url 'student_assignment_retake' instance_id=item.instance.id %}" style="margin-top: 8px;">
-                  {% csrf_token %}
-                  <button type="submit" class="btn-ai-suggest">🔄 Retake Assignment</button>
-                </form>
-              {% endif %}
+                {% if item.can_retake %}
+                    <form method="post" action="{% url 'student_assignment_retake' instance_id=item.instance.id %}" style="margin-top: 8px;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-ai-suggest">🔄 Retake Assignment</button>
+                    </form>
+                {% endif %}
             {% endif %}
           </li>
         {% endfor %}
@@ -61,6 +63,7 @@
 </section>
 
 <style>
+  /* Styling stays identical to your previous template */
   .assignments-section {
     font-family: 'Open Sans', sans-serif;
     max-width: 900px;
@@ -168,7 +171,6 @@
     padding-left: 5px;
   }
 
-  /* AI Popup */
   .ai-popup {
     position: fixed;
     top: 20vh;
