@@ -1,4 +1,5 @@
 {% load static %}
+{% load extras %} {# make sure this loads dict_get #}
 
 {% block title %}{{ instance.assignment.title }}{% endblock %}
 
@@ -9,17 +10,10 @@
     <p>{{ instance.assignment.description|default:"No description provided." }}</p>
 
     {% if instance.completed %}
-        {% if instance.score >= 70 %}
-            <div class="alert alert-success">
-                <strong>Assignment Passed!</strong> Your score: {{ instance.score|floatformat:2 }}%
-            </div>
-        {% else %}
-            <div class="alert alert-warning">
-                <strong>Assignment Completed!</strong> Your score: {{ instance.score|floatformat:2 }}% — Below passing grade
-            </div>
-        {% endif %}
-
-        <a href="{% url 'graded_assignment_download' instance.id %}" class="btn btn-primary mt-2">
+        <div class="alert alert-success">
+            <strong>Assignment Completed!</strong> Your score: {{ instance.score }}%
+        </div>
+        <a href="{% url 'graded_assignment_download' instance.id %}" class="btn btn-primary">
             Download Graded Assignment
         </a>
     {% else %}
@@ -31,19 +25,28 @@
                         <li class="mb-4">
                             <p>{{ question.question_text }}</p>
 
-                            {% if question.is_text_answer %}
-                                <!-- Text answer -->
-                                <textarea class="form-control" name="question_{{ question.id }}" rows="4" placeholder="Type your answer here..." required>{% if answers_by_question_id and answers_by_question_id|dict_key:question.id %}{{ answers_by_question_id|dict_key:question.id.text_answer }}{% endif %}</textarea>
-                            {% else %}
-                                <!-- Multiple choice -->
-                                {% for option, label in [('A', question.option_a), ('B', question.option_b), ('C', question.option_c), ('D', question.option_d)] %}
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}{{ option }}" value="{{ option }}" required
-                                        {% if answers_by_question_id and answers_by_question_id|dict_key:question.id and answers_by_question_id|dict_key:question.id.selected_option == option %}checked{% endif %}>
-                                        <label class="form-check-label" for="q{{ question.id }}{{ option }}">{{ label }}</label>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
+                            {% with answer=answers_by_question_id|dict_get:question.id %}
+                                {% if question.is_text_answer %}
+                                    <textarea class="form-control"
+                                              name="question_{{ question.id }}"
+                                              rows="4"
+                                              placeholder="Type your answer here..."
+                                              required>{% if answer %}{{ answer.text_answer }}{% endif %}</textarea>
+                                {% else %}
+                                    {% for option, label in [('A', question.option_a), ('B', question.option_b), ('C', question.option_c), ('D', question.option_d)] %}
+                                        <div class="form-check">
+                                            <input class="form-check-input"
+                                                   type="radio"
+                                                   name="question_{{ question.id }}"
+                                                   id="q{{ question.id }}{{ option }}"
+                                                   value="{{ option }}"
+                                                   required
+                                                   {% if answer and answer.selected_option == option %}checked{% endif %}>
+                                            <label class="form-check-label" for="q{{ question.id }}{{ option }}">{{ label }}</label>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
                         </li>
                     {% endfor %}
                 </ol>
