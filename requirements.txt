@@ -1,4 +1,4 @@
-﻿Django>=4.2
+﻿Django>=6.0
 djangorestframework
 gunicorn
-psycopg2-binary
+python-docx
