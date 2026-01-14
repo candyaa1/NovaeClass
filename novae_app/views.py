@@ -192,23 +192,30 @@ def student_assignment_detail(request, instance_id):
     instance = get_object_or_404(AssignmentInstance, id=instance_id, student=student)
     questions = instance.assignment.questions.all()
 
+    # Fetch all student answers for this assignment instance
+    student_answers = StudentAnswer.objects.filter(
+        assignment_instance=instance,
+        question__in=questions
+    ).select_related('question')
+
+    # Create a dictionary: {question.id: StudentAnswer}
+    answers_dict = {answer.question.id: answer for answer in student_answers}
+
     if request.method == 'POST':
         # Save answers
         for question in questions:
-            answer_text = request.POST.get(f'question_{question.id}', None)
+            answer_text = request.POST.get(f'question_{question.id}')
             if question.question_type == 'TEXT' and answer_text:
-                StudentAnswer.objects.create(
-                    student=student,
-                    question=question,
+                StudentAnswer.objects.update_or_create(
                     assignment_instance=instance,
-                    text_answer=answer_text
+                    question=question,
+                    defaults={'text_answer': answer_text, 'student': student}
                 )
             elif question.question_type == 'MC' and answer_text:
-                StudentAnswer.objects.create(
-                    student=student,
-                    question=question,
+                StudentAnswer.objects.update_or_create(
                     assignment_instance=instance,
-                    selected_option=answer_text
+                    question=question,
+                    defaults={'selected_option': answer_text, 'student': student}
                 )
 
         # Mark assignment as completed
@@ -219,9 +226,9 @@ def student_assignment_detail(request, instance_id):
 
     return render(request, 'novae_app/assignment_detail.html', {
         'instance': instance,
-        'questions': questions
+        'questions': questions,
+        'answers_dict': answers_dict  # Pass answers to template
     })
-
 
 # ---------------------------
 
