@@ -214,11 +214,10 @@ def student_assignment_detail(request, instance_id):
         question__in=questions
     ).select_related('question')
 
-    # Create a dictionary: {question.id: StudentAnswer}
-    answers_dict = {answer.question.id: answer for answer in student_answers}
+    # Dictionary: {question.id: StudentAnswer}
+    answers_by_question_id = {answer.question.id: answer for answer in student_answers}
 
     if request.method == 'POST':
-        # Save answers
         for question in questions:
             answer_text = request.POST.get(f'question_{question.id}')
             if question.question_type == 'TEXT' and answer_text:
@@ -234,7 +233,6 @@ def student_assignment_detail(request, instance_id):
                     defaults={'selected_option': answer_text, 'student': student}
                 )
 
-        # Mark assignment as completed
         instance.completed = True
         instance.save()
 
@@ -243,7 +241,7 @@ def student_assignment_detail(request, instance_id):
     return render(request, 'novae_app/assignment_detail.html', {
         'instance': instance,
         'questions': questions,
-        'answers_dict': answers_dict  # Pass answers to template
+        'answers_by_question_id': answers_by_question_id,  # renamed for clarity
     })
 
 # ---------------------------
