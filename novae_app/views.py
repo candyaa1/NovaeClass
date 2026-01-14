@@ -90,6 +90,15 @@ def student_dashboard(request):
     total_time_spent = timedelta(seconds=student.daily_time_seconds)
 
     # ------------------------
+    # Ensure all assignments have instances for this student
+    # ------------------------
+    for assignment in Assignment.objects.all():
+        AssignmentInstance.objects.get_or_create(
+            student=student,
+            assignment=assignment
+        )
+
+    # ------------------------
     # Fetch assignments and grades
     # ------------------------
     assignments = AssignmentInstance.objects.filter(
@@ -110,6 +119,7 @@ def student_dashboard(request):
     }
     return render(request, 'novae_app/student_dashboard.html', context)
 
+
 # ---------------------------
 # STUDENT ASSIGNMENTS WITH PROGRESSIVE LOCKING
 # ---------------------------
@@ -118,28 +128,35 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import AssignmentInstance
 
+
 @login_required
 def student_assignments(request):
     student = request.user.student_profile
     today = date.today()
 
-    # Fetch all assignment instances for this student, ordered by due date
+    # ------------------------
+    # Ensure AssignmentInstances exist for this student
+    # ------------------------
+    for assignment in Assignment.objects.all():
+        AssignmentInstance.objects.get_or_create(
+            student=student,
+            assignment=assignment
+        )
+
+    # Fetch all assignment instances for this student
     all_instances = AssignmentInstance.objects.filter(student=student).order_by('assignment__due_date')
 
     accessible_assignments = []
     prev_score = 100  # Unlock first assignment by default
 
     for instance in all_instances:
-        # Skip invalid assignments
         if not instance.assignment:
             continue
 
-        # Determine if the assignment is locked
         locked = False
         if prev_score < 75 and not instance.completed:
             locked = True
 
-        # Build the assignment dictionary for the template
         accessible_assignments.append({
             'instance': instance,
             'locked': locked,
@@ -148,7 +165,6 @@ def student_assignments(request):
             'score': instance.score
         })
 
-        # Update prev_score if assignment is completed
         if instance.completed and instance.score is not None:
             prev_score = instance.score
 
