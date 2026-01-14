@@ -680,3 +680,4 @@ def submit_assignment(request, assignment_id):
     return render(request, 'submit_assignment.html', {
         'assignment': assignment,
         'form': form
+    }
