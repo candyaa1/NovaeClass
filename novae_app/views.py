@@ -208,17 +208,38 @@ def student_assignment_detail(request, instance_id):
     View for students to view and submit an assignment.
     Correctly calculates score and marks assignment as completed.
     Works for MC and text answers with normalization.
-    View for students to submit and view an assignment.
-    Correctly calculates the score based on answers.
-    Handles TEXT and MC questions.
     """
     student = request.user.student_profile
     instance = get_object_or_404(AssignmentInstance, id=instance_id, student=student)
+    questions = instance.assignment.questions.all()
 
+    # Fetch existing answers to pre-fill the form
+    student_answers = StudentAnswer.objects.filter(
+        assignment_instance=instance,
+        question__in=questions
+    ).select_related('question')
+    answers_by_question_id = {ans.question.id: ans for ans in student_answers}
+
+    if request.method == 'POST':
+        total_questions = questions.count()
+        correct_answers = 0
+
+        for question in questions:
+            # Get submitted answer from POST
+            answer_text = request.POST.get(f'question_{question.id}', '').strip()
+
+            # Update or create StudentAnswer object
+            student_answer, _ = StudentAnswer.objects.update_or_create(
+                assignment_instance=instance,
+                question=question,
+                student=student
+            )
+
+            # Save the submitted answer
+            if question.question_type == 'TEXT':
                 student_answer.text_answer = answer_text
             elif question.question_type == 'MC':
                 student_answer.selected_option = answer_text
-
             student_answer.save()
 
             # -----------------------
@@ -227,18 +248,24 @@ def student_assignment_detail(request, instance_id):
             if question.question_type == 'TEXT':
                 correct_answer = (question.correct_answer or '').strip().lower()
                 if answer_text.lower() == correct_answer:
-                submitted = answer_text.lower()
-                if submitted == correct_answer:
                     correct_answers += 1
             elif question.question_type == 'MC':
                 correct_option = (question.correct_option or '').strip()
                 if answer_text.strip() == correct_option:
-                submitted = answer_text.strip()
-                if submitted == correct_option:
                     correct_answers += 1
 
         # -----------------------
+        # Calculate and save score
+        # -----------------------
+        score_percent = (correct_answers / total_questions) * 100 if total_questions > 0 else 0
+        instance.score = score_percent
+        instance.completed = True
+        instance.save()
 
+        return redirect('student_assignments')
+
+    return render(request, 'novae_app/assignment_detail.html', {
+        'instance': instance,
         'questions': questions,
         'answers_by_question_id': answers_by_question_id,
     })
@@ -512,11 +539,11 @@ def assignment_results(request, child_name):
 
     # Prepare the data to pass to the template
     assignments_data = []
-
+    
     for instance in assignments_instances:
         # Fetch questions related to the assignment
         questions = instance.assignment.questions.all()
-
+        
         # Fetch the student's answers to the questions
         answers = Answer.objects.filter(assignment_instance=instance)  # Assuming Answer model exists
 
@@ -531,7 +558,7 @@ def assignment_results(request, child_name):
         for question in questions:
             # Find the student's answer (if exists)
             student_answer = answers.filter(question=question).first()
-
+            
             assignment_data['questions'].append({
                 'question_text': question.text,
                 'correct_answer': question.correct_option,
