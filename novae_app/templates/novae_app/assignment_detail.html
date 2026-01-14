@@ -1,4 +1,3 @@
-
 {% load static %}
 
 {% block title %}{{ instance.assignment.title }}{% endblock %}
@@ -13,9 +12,48 @@
         <div class="alert alert-success">
             <strong>Assignment Completed!</strong> Your score: {{ instance.score }}%
         </div>
-        <a href="{% url 'graded_assignment_download' instance.id %}" class="btn btn-primary">
+        <a href="{% url 'graded_assignment_download' instance.id %}" class="btn btn-primary mb-3">
             Download Graded Assignment
         </a>
+
+        <h3>Questions & Your Answers</h3>
+        <ol>
+            {% for question in questions %}
+                <li class="mb-4">
+                    <p><strong>{{ question.question_text }}</strong></p>
+
+                    {% comment %} Get the student's answer {% endcomment %}
+                    {% with answer=question.studentanswer_set.get(assignment_instance=instance) %}
+                        {% if question.is_text_answer %}
+                            <p><strong>Your Answer:</strong> {{ answer.text_answer|default:"Not answered" }}</p>
+                            {% if answer.is_correct %}
+                                <span style="color:green;">✅ Correct</span>
+                            {% else %}
+                                <span style="color:red;">❌ Incorrect</span>
+                                <p><strong>Correct Answer:</strong> {{ question.correct_answer_text }}</p>
+                            {% endif %}
+                        {% else %}
+                            <p><strong>Your Answer:</strong>
+                                {% if answer.selected_option %}
+                                    {{ answer.selected_option }} - 
+                                    {% if answer.is_correct %}
+                                        <span style="color:green;">✅ Correct</span>
+                                    {% else %}
+                                        <span style="color:red;">❌ Incorrect</span>
+                                    {% endif %}
+                                {% else %}
+                                    Not answered
+                                {% endif %}
+                            </p>
+                            {% if not answer.is_correct %}
+                                <p><strong>Correct Answer:</strong> {{ question.correct_option }}</p>
+                            {% endif %}
+                        {% endif %}
+                    {% endwith %}
+                </li>
+            {% endfor %}
+        </ol>
+
     {% else %}
         <form method="post">
             {% csrf_token %}
@@ -26,10 +64,8 @@
                             <p>{{ question.question_text }}</p>
 
                             {% if question.is_text_answer %}
-                                <!-- Text answer -->
                                 <textarea class="form-control" name="question_{{ question.id }}" rows="4" placeholder="Type your answer here..." required></textarea>
                             {% else %}
-                                <!-- Multiple choice -->
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}a" value="A" required>
                                     <label class="form-check-label" for="q{{ question.id }}a">{{ question.option_a }}</label>
