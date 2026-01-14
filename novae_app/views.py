@@ -176,7 +176,9 @@ def student_assignments(request):
         'grades': grades,
     }
 
-    return render(request, 'nova_app/student_assignments.html', context)
+    return render(request, "nova_app/student_assignments.html")
+
+
 
 
 
