@@ -33,29 +33,16 @@
 
                             {% if question.is_text_answer %}
                                 <!-- Text answer -->
-                                <textarea class="form-control" name="question_{{ question.id }}" rows="4" placeholder="Type your answer here..." required>{% if answers_by_question_id|default:{} %}{{ answers_by_question_id|dict_key:question.id.text_answer }}{% endif %}</textarea>
+                                <textarea class="form-control" name="question_{{ question.id }}" rows="4" placeholder="Type your answer here..." required>{% if answers_by_question_id and answers_by_question_id|dict_key:question.id %}{{ answers_by_question_id|dict_key:question.id.text_answer }}{% endif %}</textarea>
                             {% else %}
                                 <!-- Multiple choice -->
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}a" value="A" required
-                                        {% if answers_by_question_id|default:{}|dict_key:question.id.selected_option == "A" %}checked{% endif %}>
-                                    <label class="form-check-label" for="q{{ question.id }}a">{{ question.option_a }}</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}b" value="B"
-                                        {% if answers_by_question_id|default:{}|dict_key:question.id.selected_option == "B" %}checked{% endif %}>
-                                    <label class="form-check-label" for="q{{ question.id }}b">{{ question.option_b }}</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}c" value="C"
-                                        {% if answers_by_question_id|default:{}|dict_key:question.id.selected_option == "C" %}checked{% endif %}>
-                                    <label class="form-check-label" for="q{{ question.id }}c">{{ question.option_c }}</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}d" value="D"
-                                        {% if answers_by_question_id|default:{}|dict_key:question.id.selected_option == "D" %}checked{% endif %}>
-                                    <label class="form-check-label" for="q{{ question.id }}d">{{ question.option_d }}</label>
-                                </div>
+                                {% for option, label in [('A', question.option_a), ('B', question.option_b), ('C', question.option_c), ('D', question.option_d)] %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}{{ option }}" value="{{ option }}" required
+                                        {% if answers_by_question_id and answers_by_question_id|dict_key:question.id and answers_by_question_id|dict_key:question.id.selected_option == option %}checked{% endif %}>
+                                        <label class="form-check-label" for="q{{ question.id }}{{ option }}">{{ label }}</label>
+                                    </div>
+                                {% endfor %}
                             {% endif %}
                         </li>
                     {% endfor %}
