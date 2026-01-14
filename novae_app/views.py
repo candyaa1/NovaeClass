@@ -113,6 +113,11 @@ def student_dashboard(request):
 # ---------------------------
 # STUDENT ASSIGNMENTS WITH PROGRESSIVE LOCKING
 # ---------------------------
+from datetime import date
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import AssignmentInstance
+
 @login_required
 def student_assignments(request):
     student = request.user.student_profile
@@ -125,6 +130,10 @@ def student_assignments(request):
     prev_score = 100  # Unlock first assignment by default
 
     for instance in all_instances:
+        # Skip invalid assignments
+        if not instance.assignment:
+            continue
+
         # Determine if the assignment is locked
         locked = False
         if prev_score < 75 and not instance.completed:
@@ -154,16 +163,13 @@ def student_assignments(request):
         if item['instance'].assignment.due_date < today
     ]
 
-    # All grades (completed assignments with scores)
-    grades = AssignmentInstance.objects.filter(student=student, completed=True, score__isnull=False)
-
     context = {
         'assignments': upcoming_assignments,
         'past_assignments': past_assignments,
-        'grades': grades,
     }
 
     return render(request, 'novae_app/student_assignments.html', context)
+
 # ---------------------------
 # RETAKE ASSIGNMENT
 # ---------------------------
