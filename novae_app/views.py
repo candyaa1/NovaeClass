@@ -654,30 +654,60 @@ from .forms import AssignmentSubmissionForm
 def submit_assignment(request, assignment_id):
     assignment = get_object_or_404(Assignment, id=assignment_id)
     student = get_object_or_404(StudentProfile, user=request.user)
+
+    # Get or create assignment instance
+    instance, _ = AssignmentInstance.objects.get_or_create(
+        assignment=assignment,
+        student=student
+    )
+
     questions = assignment.questions.all()
 
     if request.method == "POST":
         form = AssignmentSubmissionForm(questions, request.POST)
+
         if form.is_valid():
+            correct_count = 0
+            total_questions = questions.count()
+
             for question in questions:
                 answer_value = form.cleaned_data.get(f'q_{question.id}')
+
+                student_answer, _ = StudentAnswer.objects.update_or_create(
+                    assignment_instance=instance,
+                    question=question,
+                    student=student
+                )
+
+                # ---------- TEXT QUESTION ----------
                 if question.is_text_answer:
-                    StudentAnswer.objects.create(
-                        student=student,
-                        question=question,
-                        answer_text=answer_value
-                    )
+                    student_answer.text_answer = answer_value or ""
+
+                    # Auto-grade text ONLY if correct_answer exists
+                    if question.correct_answer:
+                        if student_answer.text_answer.strip().lower() == question.correct_answer.strip().lower():
+                            correct_count += 1
+
+                # ---------- MULTIPLE CHOICE ----------
                 else:
-                    StudentAnswer.objects.create(
-                        student=student,
-                        question=question,
-                        selected_option=answer_value
-                    )
-            return redirect('assignment_success')
+                    student_answer.selected_option = answer_value
+
+                    if answer_value == question.correct_option:
+                        correct_count += 1
+
+                student_answer.save()
+
+            # ---------- FINAL SCORE ----------
+            instance.score = (correct_count / total_questions) * 100 if total_questions else 0
+            instance.completed = True
+            instance.save()
+
+            return redirect('student_assignments')
+
     else:
         form = AssignmentSubmissionForm(questions)
 
     return render(request, 'submit_assignment.html', {
         'assignment': assignment,
         'form': form
-    }
+    })
