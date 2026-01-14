@@ -90,6 +90,15 @@ def student_dashboard(request):
     total_time_spent = timedelta(seconds=student.daily_time_seconds)
 
     # ------------------------
+    # Ensure all assignments have instances for this student
+    # ------------------------
+    for assignment in Assignment.objects.all():
+        AssignmentInstance.objects.get_or_create(
+            student=student,
+            assignment=assignment
+        )
+
+    # ------------------------
     # Fetch assignments and grades
     # ------------------------
     assignments = AssignmentInstance.objects.filter(
@@ -110,27 +119,44 @@ def student_dashboard(request):
     }
     return render(request, 'novae_app/student_dashboard.html', context)
 
+
 # ---------------------------
 # STUDENT ASSIGNMENTS WITH PROGRESSIVE LOCKING
 # ---------------------------
+from datetime import date
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import AssignmentInstance
+
+
 @login_required
 def student_assignments(request):
     student = request.user.student_profile
     today = date.today()
 
-    # Fetch all assignment instances for this student, ordered by due date
+    # ------------------------
+    # Ensure AssignmentInstances exist for this student
+    # ------------------------
+    for assignment in Assignment.objects.all():
+        AssignmentInstance.objects.get_or_create(
+            student=student,
+            assignment=assignment
+        )
+
+    # Fetch all assignment instances for this student
     all_instances = AssignmentInstance.objects.filter(student=student).order_by('assignment__due_date')
 
     accessible_assignments = []
     prev_score = 100  # Unlock first assignment by default
 
     for instance in all_instances:
-        # Determine if the assignment is locked
+        if not instance.assignment:
+            continue
+
         locked = False
         if prev_score < 75 and not instance.completed:
             locked = True
 
-        # Build the assignment dictionary for the template
         accessible_assignments.append({
             'instance': instance,
             'locked': locked,
@@ -139,7 +165,6 @@ def student_assignments(request):
             'score': instance.score
         })
 
-        # Update prev_score if assignment is completed
         if instance.completed and instance.score is not None:
             prev_score = instance.score
 
@@ -154,16 +179,13 @@ def student_assignments(request):
         if item['instance'].assignment.due_date < today
     ]
 
-    # All grades (completed assignments with scores)
-    grades = AssignmentInstance.objects.filter(student=student, completed=True, score__isnull=False)
-
     context = {
         'assignments': upcoming_assignments,
         'past_assignments': past_assignments,
-        'grades': grades,
     }
 
     return render(request, 'novae_app/student_assignments.html', context)
+
 # ---------------------------
 # RETAKE ASSIGNMENT
 # ---------------------------
@@ -182,54 +204,46 @@ from .models import AssignmentInstance, StudentAnswer
 
 @login_required
 def student_assignment_detail(request, instance_id):
+    """
+    View for students to view and submit an assignment.
+    Correctly calculates score and marks assignment as completed.
+    Works for MC and text answers with normalization.
+    View for students to submit and view an assignment.
+    Correctly calculates the score based on answers.
+    Handles TEXT and MC questions.
+    """
     student = request.user.student_profile
     instance = get_object_or_404(AssignmentInstance, id=instance_id, student=student)
-    questions = instance.assignment.questions.all()
+@@ -240,18 +240,21 @@
+                student_answer.text_answer = answer_text
+            elif question.question_type == 'MC':
+                student_answer.selected_option = answer_text
 
-    if request.method == 'POST':
-        # Save answers
-        for question in questions:
-            answer_text = request.POST.get(f'question_{question.id}', None)
-            if question.question_type == 'TEXT' and answer_text:
-                StudentAnswer.objects.create(
-                    student=student,
-                    question=question,
-                    assignment_instance=instance,
-                    text_answer=answer_text
-                )
-            elif question.question_type == 'MC' and answer_text:
-                StudentAnswer.objects.create(
-                    student=student,
-                    question=question,
-                    assignment_instance=instance,
-                    selected_option=answer_text
-                )
+            student_answer.save()
 
-        # Mark assignment as completed
-        instance.completed = True
-        instance.save()
+            # -----------------------
+            # Check correctness
+            # -----------------------
+            if question.question_type == 'TEXT':
+                correct_answer = (question.correct_answer or '').strip().lower()
+                if answer_text.lower() == correct_answer:
+                submitted = answer_text.lower()
+                if submitted == correct_answer:
+                    correct_answers += 1
+            elif question.question_type == 'MC':
+                correct_option = (question.correct_option or '').strip()
+                if answer_text.strip() == correct_option:
+                submitted = answer_text.strip()
+                if submitted == correct_option:
+                    correct_answers += 1
 
-        return redirect('student_assignments')
-
-    return render(request, 'novae_app/assignment_detail.html', {
-        'instance': instance,
-        'questions': questions
+        # -----------------------
+@@ -269,456 +272,455 @@
+        'questions': questions,
+        'answers_by_question_id': answers_by_question_id,
     })
-
-
 # ---------------------------
-# ASSIGNMENT DETAIL & AUTO-GRADE WITH LOCK
-# ---------------------------
-@login_required
-def student_assignments(request):
-    student = request.user.student_profile
-    # Only show assignments that are NOT completed
-    assignments = AssignmentInstance.objects.filter(student=student, completed=False).order_by('assignment__due_date')
 
-    context = {
-        'assignments': assignments
-    }
-    return render(request, 'novae_app/student_assignments.html', context)
 
 # ---------------------------
 # STUDENT GRADES
@@ -654,56 +668,26 @@ from .forms import AssignmentSubmissionForm
 def submit_assignment(request, assignment_id):
     assignment = get_object_or_404(Assignment, id=assignment_id)
     student = get_object_or_404(StudentProfile, user=request.user)
-
-    # Get or create assignment instance
-    instance, _ = AssignmentInstance.objects.get_or_create(
-        assignment=assignment,
-        student=student
-    )
-
     questions = assignment.questions.all()
 
     if request.method == "POST":
         form = AssignmentSubmissionForm(questions, request.POST)
-
         if form.is_valid():
-            correct_count = 0
-            total_questions = questions.count()
-
             for question in questions:
                 answer_value = form.cleaned_data.get(f'q_{question.id}')
-
-                student_answer, _ = StudentAnswer.objects.update_or_create(
-                    assignment_instance=instance,
-                    question=question,
-                    student=student
-                )
-
-                # ---------- TEXT QUESTION ----------
                 if question.is_text_answer:
-                    student_answer.text_answer = answer_value or ""
-
-                    # Auto-grade text ONLY if correct_answer exists
-                    if question.correct_answer:
-                        if student_answer.text_answer.strip().lower() == question.correct_answer.strip().lower():
-                            correct_count += 1
-
-                # ---------- MULTIPLE CHOICE ----------
+                    StudentAnswer.objects.create(
+                        student=student,
+                        question=question,
+                        answer_text=answer_value
+                    )
                 else:
-                    student_answer.selected_option = answer_value
-
-                    if answer_value == question.correct_option:
-                        correct_count += 1
-
-                student_answer.save()
-
-            # ---------- FINAL SCORE ----------
-            instance.score = (correct_count / total_questions) * 100 if total_questions else 0
-            instance.completed = True
-            instance.save()
-
-            return redirect('student_assignments')
-
+                    StudentAnswer.objects.create(
+                        student=student,
+                        question=question,
+                        selected_option=answer_value
+                    )
+            return redirect('assignment_success')
     else:
         form = AssignmentSubmissionForm(questions)
 
