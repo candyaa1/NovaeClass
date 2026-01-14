@@ -218,18 +218,7 @@ def student_assignment_detail(request, instance_id):
 
 
 # ---------------------------
-# ASSIGNMENT DETAIL & AUTO-GRADE WITH LOCK
-# ---------------------------
-@login_required
-def student_assignments(request):
-    student = request.user.student_profile
-    # Only show assignments that are NOT completed
-    assignments = AssignmentInstance.objects.filter(student=student, completed=False).order_by('assignment__due_date')
 
-    context = {
-        'assignments': assignments
-    }
-    return render(request, 'novae_app/student_assignments.html', context)
 
 # ---------------------------
 # STUDENT GRADES
