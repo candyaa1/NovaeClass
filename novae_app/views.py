@@ -134,25 +134,19 @@ def student_assignments(request):
     student = request.user.student_profile
     today = date.today()
 
-    # ------------------------
-    # Ensure AssignmentInstances exist for this student
-    # ------------------------
-    for assignment in Assignment.objects.all():
-        AssignmentInstance.objects.get_or_create(
-            student=student,
-            assignment=assignment
-        )
-
-    # Fetch all assignment instances for this student
+    # All assignment instances for this student, ordered by due date
     all_instances = AssignmentInstance.objects.filter(student=student).order_by('assignment__due_date')
 
     accessible_assignments = []
-    prev_score = 100  # Unlock first assignment by default
+    prev_score = 100  # Start unlocked
 
     for instance in all_instances:
-        if not instance.assignment:
+        # Skip completed assignments with score >= 75 (hide them)
+        if instance.completed and instance.score is not None and instance.score >= 75:
+            prev_score = instance.score
             continue
 
+        # Lock assignment if previous score < 75 and current not completed
         locked = False
         if prev_score < 75 and not instance.completed:
             locked = True
@@ -160,31 +154,31 @@ def student_assignments(request):
         accessible_assignments.append({
             'instance': instance,
             'locked': locked,
-            'can_retake': instance.retake_allowed() if instance.completed else False,
-            'completed': instance.completed,
-            'score': instance.score
+            'can_retake': instance.retake_allowed()
         })
 
+        # Update prev_score only if assignment is completed
         if instance.completed and instance.score is not None:
             prev_score = instance.score
 
-    # Separate upcoming and past assignments
-    upcoming_assignments = [
-        item for item in accessible_assignments
-        if item['instance'].assignment.due_date >= today
-    ]
+    # Upcoming assignments (due today or later)
+    upcoming_assignments = [item for item in accessible_assignments if item['instance'].assignment.due_date >= today]
 
-    past_assignments = [
-        item for item in accessible_assignments
-        if item['instance'].assignment.due_date < today
-    ]
+    # Past assignments (due before today)
+    past_assignments = [item for item in accessible_assignments if item['instance'].assignment.due_date < today]
+
+    # Grades (all completed assignments with scores)
+    grades = AssignmentInstance.objects.filter(student=student, completed=True, score__isnull=False)
 
     context = {
         'assignments': upcoming_assignments,
         'past_assignments': past_assignments,
+        'grades': grades,
     }
 
-    return render(request, 'novae_app/student_assignments.html', context)
+    return render(request, 'core/student_assignments.html', context)
+
+
 
 # ---------------------------
 # RETAKE ASSIGNMENT
