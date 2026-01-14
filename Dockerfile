@@ -19,4 +19,4 @@ EXPOSE 8000
 
 # Command to run the app using Gunicorn
 # Replace 'myproject' with the actual folder containing wsgi.py
-CMD ["gunicorn", "myproject.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
+CMD ["gunicorn", "novaeclass.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]

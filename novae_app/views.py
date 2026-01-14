@@ -13,7 +13,6 @@ from .models import (
     StudyPlan
 )
 from .forms import StudyPlanForm
-from docx import Document
 import random
 from datetime import date
 
