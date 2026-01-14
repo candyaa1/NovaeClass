@@ -121,3 +121,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"  # Where collectstatic will put files
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+CSRF_TRUSTED_ORIGINS = [
+    "https://novaeclass.onrender.com",   # Render service domain
+    "https://www.novaeclass.com",        # your custom domain (if applicable)
+]
