@@ -207,12 +207,13 @@ def student_assignment_detail(request, instance_id):
     """
     View for students to view and submit an assignment.
     Correctly calculates score and marks assignment as completed.
+    Works for MC and text answers with normalization.
     """
     student = request.user.student_profile
     instance = get_object_or_404(AssignmentInstance, id=instance_id, student=student)
     questions = instance.assignment.questions.all()
 
-    # Fetch existing answers for this student/assignment
+    # Fetch existing answers to pre-fill the form
     student_answers = StudentAnswer.objects.filter(
         assignment_instance=instance,
         question__in=questions
@@ -227,27 +228,35 @@ def student_assignment_detail(request, instance_id):
             # Get submitted answer from POST
             answer_text = request.POST.get(f'question_{question.id}', '').strip()
 
-            # Update or create StudentAnswer
+            # Update or create StudentAnswer object
             student_answer, _ = StudentAnswer.objects.update_or_create(
                 assignment_instance=instance,
                 question=question,
                 student=student
             )
 
+            # Save the submitted answer
             if question.question_type == 'TEXT':
                 student_answer.text_answer = answer_text
-                # Check correctness (case-insensitive)
-                if answer_text.lower() == (question.correct_answer or '').strip().lower():
-                    correct_answers += 1
             elif question.question_type == 'MC':
                 student_answer.selected_option = answer_text
-                # Check correctness
-                if answer_text == question.correct_option:
-                    correct_answers += 1
-
             student_answer.save()
 
-        # Calculate percentage score
+            # -----------------------
+            # Check correctness
+            # -----------------------
+            if question.question_type == 'TEXT':
+                correct_answer = (question.correct_answer or '').strip().lower()
+                if answer_text.lower() == correct_answer:
+                    correct_answers += 1
+            elif question.question_type == 'MC':
+                correct_option = (question.correct_option or '').strip()
+                if answer_text.strip() == correct_option:
+                    correct_answers += 1
+
+        # -----------------------
+        # Calculate and save score
+        # -----------------------
         score_percent = (correct_answers / total_questions) * 100 if total_questions > 0 else 0
         instance.score = score_percent
         instance.completed = True
