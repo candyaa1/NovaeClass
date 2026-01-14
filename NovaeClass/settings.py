@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
     "kubernetes.docker.internal",
     "novaeclass.onrender.com",
     "www.novaeclass.com",
+    "*"
 ]
 
 
