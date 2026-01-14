@@ -1,3 +1,8 @@
+{% load static %}
+
+{% block title %}Student Assignments{% endblock %}
+
+{% block content %}
 <section class="assignments-section">
   <h2>📚 Assignments Dashboard</h2>
 
@@ -12,9 +17,11 @@
             <div>
               {% if item.instance and item.instance.id %}
                   {% if item.completed %}
-                      <strong>{{ item.instance.assignment.title }} ✅</strong>
+                      <strong>{{ item.instance.assignment.title }} ✅ — Score: {{ item.score }}%</strong>
                   {% elif item.locked %}
-                      <strong>{{ item.instance.assignment.title }} 🔒</strong>
+                      <strong style="color:#999;" title="Score at least 75% on previous assignments to unlock">
+                          {{ item.instance.assignment.title }} 🔒
+                      </strong>
                   {% else %}
                       <a href="{% url 'student_assignment_detail' instance_id=item.instance.id %}">
                         <strong>{{ item.instance.assignment.title }}</strong>
@@ -63,7 +70,7 @@
 </section>
 
 <style>
-  /* Styling stays identical to your previous template */
+  /* Assignment Dashboard Styling */
   .assignments-section {
     font-family: 'Open Sans', sans-serif;
     max-width: 900px;
@@ -212,18 +219,7 @@
     const textEl = document.getElementById('ai-popup-text');
 
     titleEl.textContent = `AI Help: ${title}`;
-    textEl.textContent = `Here’s a quick tip on "${title}": Try breaking the assignment into smaller tasks, set a schedule, and ask for clarifications early! Need more help? Just ask your teacher or use the AI assistant.`;
-
-    popup.classList.remove('hidden');
-  }
-
-  function showAISummary(title) {
-    const popup = document.getElementById('ai-popup');
-    const titleEl = document.getElementById('ai-popup-title');
-    const textEl = document.getElementById('ai-popup-text');
-
-    titleEl.textContent = `AI Summary: ${title}`;
-    textEl.textContent = `This assignment focused on key concepts to help you understand the material better. Review your notes and try practice problems to improve your score!`;
+    textEl.textContent = `Here’s a quick tip on "${title}": Break the assignment into smaller tasks, set a schedule, and ask for clarifications early! Need more help? Ask your teacher or use the AI assistant.`;
 
     popup.classList.remove('hidden');
   }
@@ -232,3 +228,4 @@
     document.getElementById('ai-popup').classList.add('hidden');
   }
 </script>
+{% endblock %}
