@@ -125,3 +125,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://novaeclass.onrender.com",   # Render service domain
     "https://www.novaeclass.com",        # your custom domain (if applicable)
 ]
+# settings.py
+
+# Redirect users after login to your home dashboard instead of /accounts/profile/
+LOGIN_REDIRECT_URL = "/student/dashboard/"
