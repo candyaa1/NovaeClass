@@ -205,9 +205,9 @@ from .models import AssignmentInstance, StudentAnswer
 @login_required
 def student_assignment_detail(request, instance_id):
     """
-    View for students to view and submit an assignment.
-    Correctly calculates score and marks assignment as completed.
-    Works for MC and text answers with normalization.
+    View for students to submit and view an assignment.
+    Correctly calculates the score based on answers.
+    Handles TEXT and MC questions.
     """
     student = request.user.student_profile
     instance = get_object_or_404(AssignmentInstance, id=instance_id, student=student)
@@ -240,6 +240,7 @@ def student_assignment_detail(request, instance_id):
                 student_answer.text_answer = answer_text
             elif question.question_type == 'MC':
                 student_answer.selected_option = answer_text
+
             student_answer.save()
 
             # -----------------------
@@ -247,11 +248,13 @@ def student_assignment_detail(request, instance_id):
             # -----------------------
             if question.question_type == 'TEXT':
                 correct_answer = (question.correct_answer or '').strip().lower()
-                if answer_text.lower() == correct_answer:
+                submitted = answer_text.lower()
+                if submitted == correct_answer:
                     correct_answers += 1
             elif question.question_type == 'MC':
                 correct_option = (question.correct_option or '').strip()
-                if answer_text.strip() == correct_option:
+                submitted = answer_text.strip()
+                if submitted == correct_option:
                     correct_answers += 1
 
         # -----------------------
@@ -269,7 +272,6 @@ def student_assignment_detail(request, instance_id):
         'questions': questions,
         'answers_by_question_id': answers_by_question_id,
     })
-# ---------------------------
 
 
 # ---------------------------
