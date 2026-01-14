@@ -1,0 +1,119 @@
+<h2>📚 Learning Materials</h2>
+
+{% if materials %}
+  <div class="materials-grid">
+    {% for material in materials %}
+      <a href="{{ material.file_url }}" target="_blank" class="material-card" title="Open {{ material.title }}">
+        <div class="material-icon">📄</div>
+        <div class="material-info">
+          <h3 class="material-title">{{ material.title }}</h3>
+          <p class="material-grade">For Grade: {{ material.grade_level }}</p>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="no-materials">No materials uploaded yet. Check back soon!</p>
+{% endif %}
+
+<section class="recommended-materials">
+  <h3>🤖 Recommended for You</h3>
+  <p>Our AI suggests these materials to boost your learning based on your progress:</p>
+  <ul>
+    {% for material in recommended_materials %}
+      <li><a href="{{ material.file_url }}" target="_blank">{{ material.title }}</a></li>
+    {% empty %}
+      <li>No recommendations at this time.</li>
+    {% endfor %}
+  </ul>
+</section>
+
+<style>
+  h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    color: #2a7a2a;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  .materials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto 50px;
+  }
+  .material-card {
+    display: flex;
+    align-items: center;
+    background: #eaf4ea;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(42, 122, 42, 0.2);
+    color: #244d24;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .material-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 26px rgba(42, 122, 42, 0.35);
+  }
+  .material-icon {
+    font-size: 3rem;
+    margin-right: 15px;
+  }
+  .material-info {
+    flex: 1;
+  }
+  .material-title {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+  .material-grade {
+    margin: 6px 0 0;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: #3b7d3b;
+  }
+  .no-materials {
+    font-style: italic;
+    text-align: center;
+    color: #7a7a7a;
+    font-size: 1.2rem;
+  }
+
+  .recommended-materials {
+    max-width: 800px;
+    margin: 0 auto 60px;
+    padding: 20px 30px;
+    background: #f0f9f0;
+    border-radius: 18px;
+    box-shadow: 0 5px 20px rgba(42, 122, 42, 0.15);
+    font-family: 'Poppins', sans-serif;
+  }
+  .recommended-materials h3 {
+    font-size: 1.8rem;
+    color: #2a7a2a;
+    margin-bottom: 12px;
+  }
+  .recommended-materials p {
+    margin-bottom: 20px;
+    font-size: 1rem;
+    color: #416d41;
+  }
+  .recommended-materials ul {
+    list-style: disc inside;
+    padding-left: 0;
+    color: #365436;
+  }
+  .recommended-materials li a {
+    color: #2a7a2a;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .recommended-materials li a:hover {
+    text-decoration: underline;
+  }
+</style>

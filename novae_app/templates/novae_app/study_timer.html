@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Study Timer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 400px;
+      margin: 3rem auto;
+      text-align: center;
+      background-color: #f1f3f2;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2e4d2c;
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+    }
+    #timer {
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      font-weight: bold;
+      color: #2e7d32;
+      font-family: 'Courier New', monospace;
+    }
+    button {
+      background-color: #2e4d2c;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      margin: 0 10px;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #1b3a1a;
+    }
+    button:disabled {
+      background-color: #a1b8a1;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h1>Study Timer</h1>
+  <div id="timer">00:00:00</div>
+  <button id="startBtn">Start</button>
+  <button id="stopBtn" disabled>Stop</button>
+  <button id="resetBtn" disabled>Reset</button>
+
+  <!-- Audio element for soft orchestra music -->
+  <audio id="orchestraMusic" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2021/12/02/audio_27db8c0f2d.mp3?filename=soft-piano-ambient-11633.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    let timerInterval;
+    let elapsedSeconds = 0;
+
+    const timerDisplay = document.getElementById('timer');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const orchestraMusic = document.getElementById('orchestraMusic');
+
+    function formatTime(seconds) {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      return `${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+    }
+
+    function updateTimer() {
+      elapsedSeconds++;
+      timerDisplay.textContent = formatTime(elapsedSeconds);
+    }
+
+    startBtn.addEventListener('click', () => {
+      timerInterval = setInterval(updateTimer, 1000);
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      resetBtn.disabled = true;
+
+      orchestraMusic.volume = 0.3;  // soft volume
+      orchestraMusic.play().catch(error => {
+        console.log('Playback error:', error);
+      });
+    });
+
+    stopBtn.addEventListener('click', () => {
+      clearInterval(timerInterval);
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      resetBtn.disabled = false;
+
+      orchestraMusic.pause();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      elapsedSeconds = 0;
+      timerDisplay.textContent = "00:00:00";
+      resetBtn.disabled = true;
+    });
+  </script>
+</body>
+</html>

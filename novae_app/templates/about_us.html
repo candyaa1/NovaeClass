@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NovaeClass | About Us</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #fdf6e3, #ffeaa7);
+    color: #2d3436;
+    line-height: 1.6;
+}
+
+header {
+    background: #6c5ce7;
+    padding: 40px 20px;
+    text-align: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 50px;
+    color: #fff;
+    position: relative;
+}
+
+header::after {
+    content: "🎒📚✏️";
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 40px;
+}
+
+nav {
+    background: #fd79a8;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 15px 0;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    margin: 10px 20px;
+    padding: 8px 15px;
+    border-radius: 10px;
+    transition: background 0.3s, transform 0.3s;
+}
+
+nav a:hover {
+    background: #fab1a0;
+    transform: scale(1.1);
+}
+
+.hero {
+    background: url('https://images.unsplash.com/photo-1596496050902-19d04cb5649c?auto=format&fit=crop&w=1470&q=80') center/cover no-repeat;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+    padding: 0 20px;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.section {
+    padding: 50px 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.section h2 {
+    text-align: center;
+    font-size: 40px;
+    margin-bottom: 30px;
+    color: #6c5ce7;
+}
+
+.section p {
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.section ul {
+    margin: 20px 0;
+    padding-left: 20px;
+}
+
+.section ul li {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.disclaimer, .terms {
+    background: #ffeaa7;
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 40px;
+}
+
+.disclaimer h3, .terms h3 {
+    color: #d63031;
+    margin-bottom: 10px;
+}
+
+footer {
+    background: #6c5ce7;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 50px;
+}
+</style>
+</head>
+<body>
+
+<header>NovaeClass</header>
+
+<nav>
+
+<a href="{% url 'student_signup' %}">Home</a>
+
+    <a href="#">About Us</a>
+</nav>
+
+<div class="hero">
+    <h1>About NovaeClass</h1>
+    <p>Empowering Parents. Enhancing Homeschooling. Simplifying Learning at Home.</p>
+</div>
+
+<div class="section">
+    <h2>Who We Are</h2>
+    <p>NovaeClass is a digital tool designed specifically for parents who homeschool their children. We provide a platform that helps organize lessons, track assignments, monitor student progress, and create a more engaging learning experience at home. Our goal is to make homeschooling easier, structured, and fun for families of all sizes.</p>
+    
+    <h2>What We Offer</h2>
+    <ul>
+        <li>Centralized dashboard for tracking your child's learning progress.</li>
+        <li>Easy setup for multiple children, including individualized profiles.</li>
+        <li>Assignment planning and tracking to keep learning organized.</li>
+        <li>Interactive resources to make lessons more engaging.</li>
+        <li>Secure and private environment for families.</li>
+    </ul>
+    
+    <h2>Our Mission</h2>
+    <p>We believe that parents are the most important educators in a child's life. NovaeClass is here to support parents by providing the tools, structure, and insights they need to homeschool confidently and effectively.</p>
+
+    <div class="disclaimer">
+        <h3>Disclaimer</h3>
+        <p>NovaeClass is <strong>not a school</strong> and is <strong>not an accredited educational institution</strong>. All content and tools provided are intended for use as a supplementary homeschooling resource. Parents remain solely responsible for the education of their children. We do not provide official grades, transcripts, or certifications.</p>
+    </div>
+
+    <div class="terms">
+        <h3>Terms of Service</h3>
+        <p>By using NovaeClass, you agree to the following:</p>
+        <ul>
+            <li>You will use the platform solely to support homeschooling activities.</li>
+            <li>All information provided in profiles and forms is accurate and maintained by the parent or guardian.</li>
+            <li>NovaeClass is not responsible for educational outcomes or compliance with local homeschooling laws.</li>
+            <li>We reserve the right to update these terms at any time; continued use constitutes acceptance of updates.</li>
+        </ul>
+    </div>
+</div>
+
+<footer>
+    &copy; 2026 NovaeClass. All rights reserved.
+</footer>
+
+</body>
+</html>

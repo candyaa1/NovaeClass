@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    /* Global Styles */
+    body {
+        margin: 0;
+        font-family: 'Roboto', sans-serif;
+        background-image: url('https://i.postimg.cc/0jthbp3y/26552.jpg');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        width: 100px;
+        background: rgba(255,255,255,0.9);
+        backdrop-filter: blur(5px);
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .sidebar h2 {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    .sidebar a {
+        text-decoration: none;
+        color: #333;
+        padding: 10px 0;
+        font-weight: 500;
+        transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+        color: #3498db;
+    }
+
+
+
+
+    /* Dashboard Main */
+    .dashboard {
+        margin-left: 40px;
+        margin-top: -40px;
+        padding: 40px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 5px;
+        justify-items: center;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-card {
+        background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+        border-radius: 10px;
+        width: 150px;   /* Fixed width */
+        height: 150px;  /* Fixed height to make it a square */
+        padding: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Center content vertically */
+        align-items: center;     /* Center content horizontally */
+        overflow: hidden;
+    }
+
+    .dashboard-card img {
+        width: 0px;
+        height: 60px;
+        object-fit: contain;
+        margin-bottom: 5px;
+        transition: transform 0.3s ease;
+    }
+
+    .dashboard-card img:hover {
+        transform: scale(1.1);
+    }
+
+    .dashboard-card h2 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .dashboard-card p {
+        font-size: 12px;
+        color: #666;
+        margin: 5px 0;
+    }
+
+    .dashboard-card a {
+        text-decoration: none;
+        color: #3498db;
+        font-weight: 600;
+        font-size: 14px;
+        display: block;
+        margin-top: 5px;
+    }
+
+    .dashboard-card a:hover {
+        color: #2980b9;
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 600px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-content h3 {
+        margin-top: 0;
+        font-size: 24px;
+    }
+
+    .modal-content button {
+        background-color: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .modal-content button:hover {
+        background-color: #2980b9;
+    }
+
+    /* Grades Table */
+    .grades-table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+
+    .grades-table th, .grades-table td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .grades-table th {
+        background-color: #2980b9;
+        color: white;
+    }
+
+    .grades-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2>NovaeClass</h2>
+    <a href="#">Dashboard</a>
+    <a href="#">Assignments</a>
+    <a href="#">Grades</a>
+    <a href="#">Messages</a>
+    <a href="#">Settings</a>
+</div>
+
+<!-- Topbar -->
+<div class="topbar">
+    <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+</div>
+
+<!-- Dashboard -->
+<div class="dashboard">
+    {% for child in children %}
+        <div class="dashboard-card" id="child-{{ child.user.id }}">
+            <img src="https://i.postimg.cc/0jthbp3y/26552.jpg" alt="Child Icon">
+            <h2>{{ child.user.username }}</h2>
+            <p>Grade: {{ child.grade }}</p>
+            <a href="#" class="grades-access-btn" data-child-id="{{ child.user.id }}">View Grades</a>
+            <a href="{% url 'parent_submitted_assignments' child.student_id %}">Submitted Assignments</a>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Grades Modal -->
+<div id="gradesModal" class="modal">
+    <div class="modal-content">
+        <h3>Grades</h3>
+        <table class="grades-table" id="grades-table"></table>
+        <button onclick="closeModal()">Close</button>
+    </div>
+</div>
+
+<script>
+    function closeModal(){ document.getElementById("gradesModal").style.display="none"; }
+
+    document.querySelectorAll('.grades-access-btn').forEach(btn=>{
+        btn.addEventListener('click', function(e){
+            e.preventDefault();
+            const childId = this.dataset.childId;
+            fetch(`/get-grades/${childId}/`)
+                .then(res=>res.json())
+                .then(grades=>{
+                    const table = document.getElementById('grades-table');
+                    if(grades.error){
+                        table.innerHTML = `<tr><td colspan="3">${grades.error}</td></tr>`;
+                    } else {
+                        table.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>Assignment</th>
+                                <th>Score</th>
+                                <th>Comments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${grades.grades.map(g=>`
+                                <tr>
+                                    <td>${g.assignment}</td>
+                                    <td>${g.score}</td>
+                                    <td>${g.comments}</td>
+                                </tr>`).join('')}
+                        </tbody>`;
+                    }
+                    document.getElementById("gradesModal").style.display="flex";
+                })
+        });
+    });
+</script>
+
+</body>
+</html>

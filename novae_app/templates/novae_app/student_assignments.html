@@ -1,0 +1,227 @@
+<section class="assignments-section">
+  <h2>📚 Assignments Dashboard</h2>
+
+  <div class="assignments-container">
+    <!-- Upcoming Assignments -->
+    <div class="assignments-block upcoming">
+      <h3>This Week’s Assignments <span class="badge" id="upcoming-count">{{ assignments|length }}</span></h3>
+      {% if assignments %}
+      <ul>
+        {% for item in assignments %}
+          <li>
+            <div>
+              {% if not item.locked %}
+                <a href="{% url 'student_assignment_detail' instance_id=item.instance.id %}">
+                  <strong>{{ item.instance.assignment.title }}</strong>
+                </a>
+              {% else %}
+                <strong>{{ item.instance.assignment.title }} 🔒</strong>
+              {% endif %}
+              — Due <time datetime="{{ item.instance.assignment.due_date }}">{{ item.instance.assignment.due_date }}</time>
+            </div>
+
+            {% if not item.locked %}
+              <button class="btn-ai-suggest" onclick="showAIHelp('{{ item.instance.assignment.title }}')">🤖 AI Help</button>
+            {% endif %}
+
+            <!-- Retake button for students who scored < 75 -->
+            {% if item.can_retake %}
+              <form method="post" action="{% url 'student_assignment_retake' instance_id=item.instance.id %}" style="margin-top: 8px;">
+                {% csrf_token %}
+                <button type="submit" class="btn-ai-suggest">🔄 Retake Assignment</button>
+              </form>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        <p class="no-assignments">No upcoming assignments! 🎉</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Return to Dashboard Button -->
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="{% url 'student_dashboard' %}" class="btn-ai-suggest">🏠 Return to Dashboard</a>
+  </div>
+
+  <!-- AI Popup -->
+  <div id="ai-popup" class="ai-popup hidden">
+    <div class="ai-popup-content">
+      <span class="close-popup" onclick="closeAIPopup()">×</span>
+      <h4 id="ai-popup-title"></h4>
+      <p id="ai-popup-text"></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .assignments-section {
+    font-family: 'Open Sans', sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .assignments-section h2 {
+    font-family: 'Gloria Hallelujah', cursive;
+    font-size: 2.8rem;
+    color: #2e4d2c;
+    margin-bottom: 25px;
+    text-align: center;
+    letter-spacing: 1.5px;
+  }
+
+  .assignments-container {
+    display: flex;
+    gap: 50px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .assignments-block {
+    flex: 1 1 400px;
+  }
+
+  .assignments-block h3 {
+    font-size: 1.8rem;
+    color: #4caf50;
+    margin-bottom: 15px;
+    position: relative;
+  }
+
+  .badge {
+    background-color: #4caf50;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  li {
+    background: #e8f5e9;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 3px 8px rgba(46, 77, 44, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  li strong {
+    font-size: 1.1rem;
+    color: #2e4d2c;
+  }
+
+  li a {
+    color: #2e4d2c;
+    text-decoration: none;
+  }
+
+  li a:hover {
+    text-decoration: underline;
+  }
+
+  time {
+    font-size: 0.9rem;
+    color: #618833;
+    margin-left: 8px;
+  }
+
+  .btn-ai-suggest {
+    background: #388e3c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-ai-suggest:hover {
+    background: #2e7d32;
+  }
+
+  .no-assignments {
+    font-style: italic;
+    color: #999;
+    padding-left: 5px;
+  }
+
+  /* AI Popup */
+  .ai-popup {
+    position: fixed;
+    top: 20vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 320px;
+    background: #f9fdf9;
+    border: 2px solid #4caf50;
+    box-shadow: 0 6px 16px rgba(46, 77, 44, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    z-index: 9999;
+  }
+
+  .ai-popup.hidden {
+    display: none;
+  }
+
+  .ai-popup-content h4 {
+    margin-top: 0;
+    color: #2e4d2c;
+  }
+
+  .close-popup {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: #4caf50;
+  }
+</style>
+
+<script>
+  function showAIHelp(title) {
+    const popup = document.getElementById('ai-popup');
+    const titleEl = document.getElementById('ai-popup-title');
+    const textEl = document.getElementById('ai-popup-text');
+
+    titleEl.textContent = `AI Help: ${title}`;
+    textEl.textContent = `Here’s a quick tip on "${title}": Try breaking the assignment into smaller tasks, set a schedule, and ask for clarifications early! Need more help? Just ask your teacher or use the AI assistant.`;
+
+    popup.classList.remove('hidden');
+  }
+
+  function showAISummary(title) {
+    const popup = document.getElementById('ai-popup');
+    const titleEl = document.getElementById('ai-popup-title');
+    const textEl = document.getElementById('ai-popup-text');
+
+    titleEl.textContent = `AI Summary: ${title}`;
+    textEl.textContent = `This assignment focused on key concepts to help you understand the material better. Review your notes and try practice problems to improve your score!`;
+
+    popup.classList.remove('hidden');
+  }
+
+  function closeAIPopup() {
+    document.getElementById('ai-popup').classList.add('hidden');
+  }
+</script>

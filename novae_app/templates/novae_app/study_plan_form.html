@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .onenote-form {
+    background-color: #f8f6ff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    max-width: 700px;
+    margin: 40px auto;
+    font-family: 'Segoe UI', 'Poppins', sans-serif;
+  }
+
+  .onenote-form h1 {
+    text-align: center;
+    color: #5e4b8b;
+    margin-bottom: 30px;
+    font-weight: 600;
+  }
+
+  .onenote-input-title,
+  .onenote-input-content,
+  .onenote-input-notes {
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 15px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background-color: #ffffff;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .onenote-input-title:focus,
+  .onenote-input-content:focus,
+  .onenote-input-notes:focus {
+    box-shadow: 0 0 0 3px #c9bfff;
+  }
+
+  .onenote-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+  }
+
+  .onenote-input-small {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 12px 15px;
+    font-size: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background-color: #ffffff;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .onenote-input-small:focus {
+    box-shadow: 0 0 0 3px #c9bfff;
+  }
+
+  .onenote-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .btn-onenote-save,
+  .btn-onenote-cancel {
+    padding: 10px 22px;
+    font-size: 1rem;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-onenote-save {
+    background-color: #5e4b8b;
+    color: white;
+  }
+
+  .btn-onenote-save:hover {
+    background-color: #473777;
+  }
+
+  .btn-onenote-cancel {
+    background-color: #e4e2f5;
+    color: #5e4b8b;
+  }
+
+  .btn-onenote-cancel:hover {
+    background-color: #d3d1f0;
+  }
+</style>
+
+<div class="onenote-form">
+  <h1>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Study Plan</h1>
+
+  <form method="post">
+    {% csrf_token %}
+
+    {{ form.title }}
+
+    <div class="onenote-row">
+      {{ form.class_name }}
+      {{ form.subject }}
+      {{ form.date }}
+    </div>
+
+    {{ form.notes }}
+
+    {{ form.content }}
+
+    <div class="onenote-buttons">
+      <button type="submit" class="btn-onenote-save">💾 Save</button>
+      <a href="{% url 'study_plan_list' %}" class="btn-onenote-cancel">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

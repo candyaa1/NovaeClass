@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard – NovaeClass</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Open+Sans&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-image: url('https://i.postimg.cc/wTPg2mxQ/9c2b066b-72e5-4cc9-aa80-60109615ff88.jpg');
+      background-size: cover;
+      background-position: center;
+      color: #333;
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    /* Header Styles */
+    .header {
+      text-align: center;
+      margin: 40px 0;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 46px;
+      font-weight: 800;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      padding: 30px;
+      width: 30%; /* Adjust width for cards */
+      display: flex;
+      flex-direction: column;  /* Changed from row to column */
+      gap: 10px;
+      justify-content: center;
+      margin-left: 200px; /* Adjust position as needed */
+    }
+
+    /* Dashboard Cards - Books Look */
+    .card {
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      flex: 1 1 100px; /* Adjust card size */
+      padding: 10px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-align: left;
+      color: #2e7d32;
+      text-decoration: none;
+      font-family: 'Gloria Hallelujah', cursive;
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+      margin: 0 10px;
+      height: 250px;
+    }
+
+    /* Card Gradient Background Colors for a "Book-like" Look */
+    .card:nth-child(1) {
+      background: linear-gradient(to bottom, #ff7e5f, #feb47b); /* Colorful gradient */
+      border-left: 15px solid #d14f44; /* Spine color */
+    }
+    .card:nth-child(2) {
+      background: linear-gradient(to bottom, #6a11cb, #2575fc);
+      border-left: 15px solid #4a2a9d;
+    }
+    .card:nth-child(3) {
+      background: linear-gradient(to bottom, #ff9a8b, #ff6a00);
+      border-left: 15px solid #e65c00;
+    }
+    .card:nth-child(4) {
+      background: linear-gradient(to bottom, #00c6ff, #0072ff);
+      border-left: 15px solid #0061d4;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .card h2 {
+      font-size: 1.2em;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: #fff;
+      font-size: 14px;
+    }
+
+    /* Square background for links */
+    .card a {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 600;
+      font-size: 16px;
+      display: block;
+      margin-top: 20px;
+      padding: 12px 20px;
+      background-color: #3498db;
+      border-radius: 8px;
+      width: fit-content;
+      transition: background-color 0.3s ease;
+    }
+
+    .card a:hover {
+      background-color: #2980b9;
+    }
+
+    /* Timer Positioning */
+    .timer {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #fff;
+      color: #333; 
+      padding: 10px;
+      border-radius: 50%;
+      font-size: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      width: 150px;
+      height: 150px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .timer h2 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: #2e4d2c;
+      font-family: 'Gloria Hallelujah', cursive;
+    }
+
+    .timer-buttons {
+      display: flex;
+      gap: 6px;
+      flex-direction: column;
+    }
+
+    .timer-button {
+      padding: 6px 12px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #3498db;
+      color: white;
+      transition: background-color 0.3s;
+    }
+
+    .timer-button:hover {
+      background-color: #2980b9;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Welcome, {{ request.user.first_name|default:request.user.username }}!</h1>
+
+    <form method="post" action="{% url 'logout' %}" class="logout-form">
+      {% csrf_token %}
+      <button type="submit" class="logout-btn">Logout</button>
+    </form>
+  </div>
+
+  <!-- Study Timer -->
+  <div class="timer" id="timer">
+    <h2>Study Timer</h2>
+    <span id="timeSpent">00:00:00</span>
+    <div class="timer-buttons">
+      <button class="timer-button" id="startStopBtn">Start</button>
+      <button class="timer-button" id="resetBtn">Reset</button>
+    </div>
+  </div>
+ <div class="main-content">
+     <a href="{% url 'student_materials' %}" class="card" title="Learning Materials">
+      <i class="fas fa-folder-open"></i>
+      <h2>Learning Materials</h2>
+    </a>
+
+
+    <a href="{% url 'student_assignments' %}" class="card" title="View Assignments">
+      <i class="fas fa-book"></i>
+      <h2>Assignments</h2>
+      <p>Check your upcoming and past homework</p>
+    </a>
+
+    <a href="{% url 'student_grades' %}" class="card" title="View Grades">
+      <i class="fas fa-chart-line"></i>
+      <h2>Grades</h2>
+    </a>
+
+
+    <a href="{% url 'study_plan_list' %}" class="card" title="Your Study Plan">
+      <i class="fas fa-calendar-check"></i>
+      <h2>Study Plan</h2>
+    </a>
+
+
+
+  <script>
+    // Timer functionality
+    let totalSeconds = 0;
+    let timerInterval;
+    const timeElement = document.getElementById('timeSpent');
+    const startStopBtn = document.getElementById('startStopBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    let isRunning = false;
+
+    function formatTime(seconds) {
+      const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+      const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+      const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    function updateTimer() {
+      totalSeconds += 1;
+      timeElement.textContent = formatTime(totalSeconds);
+    }
+
+    // Start/Stop functionality
+    function startStopTimer() {
+      if (isRunning) {
+        clearInterval(timerInterval);
+        startStopBtn.textContent = 'Start';
+      } else {
+        timerInterval = setInterval(updateTimer, 1000);
+        startStopBtn.textContent = 'Stop';
+      }
+      isRunning = !isRunning;
+    }
+
+    // Reset functionality
+    function resetTimer() {
+      clearInterval(timerInterval);
+      totalSeconds = 0;
+      timeElement.textContent = '00:00:00';
+      startStopBtn.textContent = 'Start';
+      isRunning = false;
+    }
+
+    startStopBtn.addEventListener('click', startStopTimer);
+    resetBtn.addEventListener('click', resetTimer);
+  </script>
+
+</body>
+</html>

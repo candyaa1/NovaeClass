@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Learning Games – NovaeClass</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Open+Sans&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f7faf7;
+      font-family: 'Open Sans', sans-serif;
+    }
+    .header {
+      background-color: #2e4d2c;
+      color: #fff;
+      padding: 20px 40px;
+      text-align: center;
+      font-family: 'Gloria Hallelujah', cursive;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 2.5em;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .games-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+    }
+    .game-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+      padding: 25px 20px;
+      text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      color: #2a7a2a;
+      text-decoration: none;
+      font-family: 'Gloria Hallelujah', cursive;
+      user-select: none;
+    }
+    .game-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 22px rgba(42, 122, 42, 0.25);
+      color: #1b5e20;
+    }
+    .game-card h2 {
+      font-size: 1.8rem;
+      margin: 0 0 10px;
+    }
+    .game-card p {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 1rem;
+      color: #555;
+      margin: 0;
+    }
+    .no-games {
+      font-size: 1.2rem;
+      color: #888;
+      text-align: center;
+      margin-top: 50px;
+      font-family: 'Open Sans', sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Learning Games for {{ request.user.first_name|default:request.user.username }}</h1>
+  </div>
+
+  <div class="container">
+    {% if games %}
+      <div class="games-list">
+        {% for game in games %}
+          <a href="{{ game.url }}" class="game-card" target="_blank" title="Play {{ game.title }}">
+            <h2>{{ game.title }}</h2>
+            <p>{{ game.description }}</p>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="no-games">No learning games available for your grade level yet. Check back soon!</p>
+    {% endif %}
+  </div>
+
+</body>
+</html>

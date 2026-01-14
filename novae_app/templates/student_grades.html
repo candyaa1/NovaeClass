@@ -1,0 +1,141 @@
+{% load grade_filters %}
+
+<section class="grades-section">
+  <h2>📊Grades</h2>
+
+  {% if grades %}
+    <ul class="grades-list">
+      {% for grade in grades %}
+      <li class="grade-row {{ grade.score|grade_color_class }}">
+        <div class="grade-left">
+          <strong class="grade-title">{{ grade.assignment.title }}</strong>
+          <div class="grade-progress-bar">
+            <div class="grade-progress" style="width: {{ grade.score }}%;"></div>
+          </div>
+        </div>
+        <div class="grade-right">
+          <span class="grade-score">{{ grade.score }}%</span>
+          {% if grade.feedback %}
+            <span class="grade-info" title="{{ grade.feedback }}">💬</span>
+          {% endif %}
+          <span class="grade-ai" title="{% if grade.score >= 90 %}Excellent work!{% elif grade.score >= 70 %}Good job! Review key concepts.{% else %}Focus on this topic to improve.{% endif %}">🤖</span>
+          <a href="{% url 'graded_assignment_download' grade.id %}" class="btn-download" title="Download graded work">📥</a>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="no-grades">No grades available yet. Keep up the good work!</p>
+  {% endif %}
+
+<div class="dashboard-btn-container">
+    {% if request.user.parent_profile %}
+        <a href="{% url 'parent_dashboard' %}" class="btn-download">🏠 Return to Dashboard</a>
+    {% elif request.user.student_profile %}
+        <a href="{% url 'student_dashboard' %}" class="btn-download">🏠 Return to Dashboard</a>
+    {% endif %}
+</div>
+
+
+</section>
+
+<style>
+  .grades-section {
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 20px 25px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    font-family: 'Open Sans', sans-serif;
+  }
+
+  .grades-section h2 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #2e4d2c;
+  }
+
+  .grades-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .grade-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+  }
+  .grade-left {
+    flex: 1;
+    overflow: hidden;
+  }
+  .grade-title {
+    display: block;
+    font-weight: 600;
+    color: #2e4d2c;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .grade-progress-bar {
+    background: #ddd;
+    border-radius: 6px;
+    height: 6px;
+    margin-top: 3px;
+    width: 100%;
+  }
+  .grade-progress {
+    background: currentColor;
+    height: 100%;
+    transition: width 0.4s ease;
+  }
+
+  .grade-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .grade-score {
+    font-weight: 700;
+    min-width: 35px;
+    text-align: right;
+    color: #4caf50;
+  }
+  .score-low .grade-score {
+    color: #b71c1c;
+  }
+  .grade-info, .grade-ai {
+    cursor: help;
+    font-size: 0.95rem;
+  }
+  .btn-download {
+    background: #2a7a2a;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .btn-download:hover {
+    background: #1f5e1f;
+  }
+
+  .dashboard-btn-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .no-grades {
+    text-align: center;
+    font-style: italic;
+    color: #999;
+  }
+</style>

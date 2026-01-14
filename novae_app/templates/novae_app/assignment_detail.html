@@ -1,0 +1,60 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{{ instance.assignment.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ instance.assignment.title }}</h1>
+    <p><strong>Due Date:</strong> {{ instance.assignment.due_date }}</p>
+    <p>{{ instance.assignment.description|default:"No description provided." }}</p>
+
+    {% if instance.completed %}
+        <div class="alert alert-success">
+            <strong>Assignment Completed!</strong> Your score: {{ instance.score }}%
+        </div>
+        <a href="{% url 'graded_assignment_download' instance.id %}" class="btn btn-primary">
+            Download Graded Assignment
+        </a>
+    {% else %}
+        <form method="post">
+            {% csrf_token %}
+            {% if questions %}
+                <ol>
+                    {% for question in questions %}
+                        <li class="mb-4">
+                            <p>{{ question.question_text }}</p>
+
+                            {% if question.is_text_answer %}
+                                <!-- Text answer -->
+                                <textarea class="form-control" name="question_{{ question.id }}" rows="4" placeholder="Type your answer here..." required></textarea>
+                            {% else %}
+                                <!-- Multiple choice -->
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}a" value="A" required>
+                                    <label class="form-check-label" for="q{{ question.id }}a">{{ question.option_a }}</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}b" value="B">
+                                    <label class="form-check-label" for="q{{ question.id }}b">{{ question.option_b }}</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}c" value="C">
+                                    <label class="form-check-label" for="q{{ question.id }}c">{{ question.option_c }}</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}d" value="D">
+                                    <label class="form-check-label" for="q{{ question.id }}d">{{ question.option_d }}</label>
+                                </div>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ol>
+                <button type="submit" class="btn btn-success mt-3">Submit Assignment</button>
+            {% else %}
+                <p>No questions are available for this assignment.</p>
+            {% endif %}
+        </form>
+    {% endif %}
+</div>
+{% endblock %}

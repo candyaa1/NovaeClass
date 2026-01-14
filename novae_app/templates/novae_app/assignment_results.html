@@ -1,0 +1,78 @@
+{% extends 'core/base.html' %}
+{% block title %}Assignment Results{% endblock %}
+
+{% block content %}
+<section class="assignment-result">
+    <h2>📄 Assignment Results</h2>
+
+    {% for assignment_data in assignments_data %}
+        <h3>Assignment: {{ assignment_data.assignment.title }}</h3>
+        <p><strong>Score:</strong> {{ assignment_data.score }}%</p>
+        <p><strong>Submitted On:</strong> {{ assignment_data.submitted_on }}</p>
+
+        <h4>Questions & Answers:</h4>
+        <ul>
+            {% for question in assignment_data.questions %}
+                <li>
+                    <strong>{{ forloop.counter }}. {{ question.question_text }}</strong><br>
+                    Correct Answer: {{ question.correct_answer }}<br>
+                    Your Answer: {{ question.student_answer }}<br>
+                    {% if question.is_correct %}
+                        ✅ Correct
+                    {% else %}
+                        ❌ Incorrect
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+
+    {% endfor %}
+
+    <a href="{% url 'student_assignments' %}" class="btn">← Back to Assignments</a>
+</section>
+
+<style>
+.assignment-result {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 25px 35px;
+    background: #f0fdf4;
+    border-radius: 15px;
+    box-shadow: 0 6px 18px rgba(46,77,44,0.1);
+    font-family: 'Open Sans', sans-serif;
+}
+
+.assignment-result h2 {
+    color: #2e4d2c;
+    font-size: 2.4rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.assignment-result ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.assignment-result li {
+    background: #e8f5e9;
+    padding: 12px 18px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+.assignment-result a.btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 16px;
+    background: #4caf50;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.assignment-result a.btn:hover {
+    background: #388e3c;
+}
+</style>
+{% endblock %}

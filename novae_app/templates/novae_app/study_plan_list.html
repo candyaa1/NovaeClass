@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Your Study Plans</h1>
+<a href="{% url 'study_plan_create' %}" class="btn btn-primary">Create New Study Plan</a>
+
+{% if plans %}
+  <ul>
+    {% for plan in plans %}
+      <li>
+        <strong>{{ plan.title }}</strong> (Last updated: {{ plan.updated_at|date:"M d, Y H:i" }})<br />
+        {{ plan.content|linebreaksbr|truncatechars:200 }}
+        <br />
+        <a href="{% url 'study_plan_edit' plan.pk %}">Edit</a> |
+        <a href="{% url 'study_plan_delete' plan.pk %}">Delete</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>You have no study plans yet.</p>
+{% endif %}
+{% endblock %}

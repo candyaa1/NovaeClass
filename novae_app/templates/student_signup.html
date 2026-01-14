@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NovaeClass | Homeschool Made Fun</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #fdf6e3, #ffeaa7);
+    color: #2d3436;
+}
+
+header {
+    background: #6c5ce7;
+    padding: 40px 20px;
+    text-align: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 50px;
+    color: #fff;
+    position: relative;
+}
+
+header::after {
+    content: "🎒📚✏️";
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 40px;
+}
+
+nav {
+    background: #fd79a8;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 15px 0;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    margin: 10px 20px;
+    padding: 8px 15px;
+    border-radius: 10px;
+    transition: background 0.3s, transform 0.3s;
+}
+
+nav a:hover {
+    background: #fab1a0;
+    transform: scale(1.1);
+}
+
+.hero {
+    background: url('https://images.unsplash.com/photo-1600880292203-757bb62b0a17?auto=format&fit=crop&w=1470&q=80') center/cover no-repeat;
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+    padding: 0 20px;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.hero p {
+    font-size: 20px;
+    max-width: 700px;
+}
+
+.section {
+    padding: 50px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section h2 {
+    text-align: center;
+    font-size: 40px;
+    margin-bottom: 40px;
+    color: #6c5ce7;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.card {
+    background: #ffeaa7;
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.card img {
+    width: 80px;
+    margin-bottom: 15px;
+}
+
+.card h3 {
+    margin-bottom: 10px;
+    color: #2d3436;
+}
+
+.card p {
+    font-size: 14px;
+    color: #636e72;
+}
+
+.card button {
+    margin-top: 15px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 12px;
+    background: #6c5ce7;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.card button:hover {
+    background: #a29bfe;
+}
+
+.signup-container {
+    background: #ffeaa7;
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 800px;
+    margin: 50px auto;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.signup-container h2 {
+    text-align: center;
+    color: #6c5ce7;
+    margin-bottom: 25px;
+}
+
+.signup-container h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #2d3436;
+}
+
+.signup-container input, 
+.signup-container select, 
+.signup-container textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border-radius: 10px;
+    border: 1px solid #dcdde1;
+    font-size: 14px;
+}
+
+.signup-container button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 15px;
+    font-size: 18px;
+    border-radius: 15px;
+    border: none;
+    background: #6c5ce7;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.signup-container button:hover {
+    background: #a29bfe;
+}
+
+.child-form {
+    background: #dfe6e9;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border-left: 5px solid #6c5ce7;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 15px;
+}
+
+.login-link a {
+    color: #d63031;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+footer {
+    background: #6c5ce7;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 50px;
+}
+</style>
+</head>
+<body onload="resetSignupForm()">
+
+<header>NovaeClass</header>
+
+<nav>
+    <a href="#">Home</a>
+    <a href="{% url 'about_us' %}">About Us</a>
+    <a href="#" id="nav-signup">Sign Up</a>
+</nav>
+
+<div class="hero">
+    <h1>Learning at Home, Made Fun!</h1>
+    <p>NovaeClass helps parents and students take control of their homeschool journey. Set up accounts for your children, track assignments, monitor progress, and make every lesson more engaging. Designed for learners of all ages, it’s the tool that makes homeschooling easier, organized, and enjoyable for the whole family.</p>
+</div>
+
+<div class="signup-container">
+    <h2>Sign Up Your Child</h2>
+    <form method="post" id="signup-form" autocomplete="off">
+        {% csrf_token %}
+        <h3>Parent Info</h3>
+        {{ parent_form.as_p }}
+
+        <h3>Children</h3>
+        {{ child_formset.management_form }}
+        <div id="children-forms">
+            {% for form in child_formset %}
+                <div class="child-form">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" id="add-child">➕ Add Another Child</button>
+        <button type="submit">Sign Up 🎉</button>
+    </form>
+
+    <div class="login-link">
+        Already a member? <a href="{% url 'landing' %}">Login here</a>
+    </div>
+</div>
+
+<footer>
+    &copy; 2026 NovaeClass. All rights reserved.
+</footer>
+
+<script>
+function resetSignupForm() {
+    const mainForm = document.getElementById("signup-form");
+    if(!mainForm) return;
+
+    // Reset all inputs
+    mainForm.querySelectorAll("input").forEach(input => {
+        if(input.type !== "hidden") input.value = "";
+    });
+
+    // Reset all textareas
+    mainForm.querySelectorAll("textarea").forEach(textarea => textarea.value = "");
+
+    // Reset all selects
+    mainForm.querySelectorAll("select").forEach(select => select.selectedIndex = 0);
+
+    // Remove extra child forms (keep only first)
+    const childrenForms = document.getElementById("children-forms");
+    const childForms = childrenForms.querySelectorAll(".child-form");
+    for (let i = childForms.length - 1; i > 0; i--) {
+        childrenForms.removeChild(childForms[i]);
+    }
+
+    // Reset Django management form TOTAL_FORMS
+    const totalForms = document.querySelector('#id_form-TOTAL_FORMS');
+    if(totalForms) totalForms.value = 1;
+}
+
+// --- Add child form dynamically ---
+document.addEventListener("DOMContentLoaded", function() {
+    const addButton = document.getElementById("add-child");
+    const childrenForms = document.getElementById("children-forms");
+    let totalForms = document.querySelector('#id_form-TOTAL_FORMS');
+
+    addButton.addEventListener("click", function() {
+        const currentFormCount = parseInt(totalForms.value);
+        const emptyFormTemplate = document.querySelectorAll(".child-form")[0].cloneNode(true);
+
+        emptyFormTemplate.querySelectorAll("input").forEach(function(input) {
+            if(input.type !== "hidden") input.value = "";
+            const name = input.getAttribute("name");
+            const id = input.getAttribute("id");
+            if(name) input.setAttribute("name", name.replace(/\d+/, currentFormCount));
+            if(id) input.setAttribute("id", id.replace(/\d+/, currentFormCount));
+        });
+
+        emptyFormTemplate.querySelectorAll("textarea").forEach(function(textarea) {
+            textarea.value = "";
+            const name = textarea.getAttribute("name");
+            const id = textarea.getAttribute("id");
+            if(name) textarea.setAttribute("name", name.replace(/\d+/, currentFormCount));
+            if(id) textarea.setAttribute("id", id.replace(/\d+/, currentFormCount));
+        });
+
+        emptyFormTemplate.querySelectorAll("select").forEach(function(select) {
+            const name = select.getAttribute("name");
+            const id = select.getAttribute("id");
+            if(name) select.setAttribute("name", name.replace(/\d+/, currentFormCount));
+            if(id) select.setAttribute("id", id.replace(/\d+/, currentFormCount));
+            select.selectedIndex = 0;
+        });
+
+        childrenForms.appendChild(emptyFormTemplate);
+        totalForms.value = currentFormCount + 1;
+    });
+
+    // Smooth scroll for nav
+    document.getElementById("nav-signup").addEventListener("click", function(e) {
+        e.preventDefault();
+        document.getElementById("signup-form").scrollIntoView({ behavior: "smooth" });
+    });
+});
+</script>
+
+</body>
+</html>

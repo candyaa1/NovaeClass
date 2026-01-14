@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <title>NovaeClass | Landing</title>
+  <style>
+    /* Basic reset & font */
+    body, html {
+      margin: 0; padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1e3a8a; /* deep school navy blue */
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Container card */
+    .container {
+      position: relative;
+      background: white;
+      padding: 80px 90px 80px 90px;
+      border-radius: 12px;
+      box-shadow: 0 6px 30px rgba(0,0,0,0.15);
+      max-width: 520px;
+      width: 90%;
+      text-align: center;
+      z-index: 10;
+    }
+
+    h1 {
+      margin: 0 0 10px 0;
+      font-size: 2.5em;
+      color: #2c3e50;
+    }
+
+    p.subtitle {
+      margin: 0 0 40px 0;
+      color: #4b5563;
+      font-size: 1.1em;
+    }
+
+    .login-links a {
+      margin: 10px 20px;
+      padding: 12px 30px;
+      text-decoration: none;
+      background: #2563eb; /* bright blue */
+      color: white;
+      border-radius: 6px;
+      font-size: 1em;
+      transition: background-color 0.3s ease;
+    }
+
+    .login-links a:hover {
+      background: #1d4ed8;
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 0.85em;
+      color: #94a3b8;
+    }
+
+    /* Animated floating icons container */
+    .floating-icons {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none; /* ignore mouse */
+      overflow: visible;
+      z-index: 1;
+    }
+
+    /* Each floating icon */
+    .floating-icon {
+      position: absolute;
+      fill: #93c5fd; /* light blue */
+      opacity: 0.7;
+      animation: floatUp 10s linear infinite;
+      filter: drop-shadow(0 0 2px rgba(255 255 255 / 0.5));
+    }
+
+    /* Animate upward and fade out */
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) scale(0.5);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Animated floating icons behind -->
+  <div class="floating-icons" aria-hidden="true">
+
+    <!-- Book -->
+    <svg class="floating-icon" style="left: 10vw; animation-delay: 0s; width: 40px; height: 40px;" viewBox="0 0 64 64" >
+      <rect x="12" y="10" width="40" height="44" rx="4" ry="4" stroke="#2c3e50" stroke-width="2" fill="#3b82f6"/>
+      <line x1="20" y1="20" x2="44" y2="20" stroke="#bfdbfe" stroke-width="2"/>
+      <line x1="20" y1="28" x2="44" y2="28" stroke="#bfdbfe" stroke-width="2"/>
+      <line x1="20" y1="36" x2="44" y2="36" stroke="#bfdbfe" stroke-width="2"/>
+      <line x1="20" y1="44" x2="44" y2="44" stroke="#bfdbfe" stroke-width="2"/>
+    </svg>
+
+    <!-- Pencil -->
+    <svg class="floating-icon" style="left: 30vw; animation-delay: 3s; width: 30px; height: 30px;" viewBox="0 0 64 64">
+      <polygon fill="#fbbf24" points="2,62 12,52 52,12 62,22 22,62 2,62"/>
+      <polygon fill="#1e293b" points="12,52 22,62 14,60 10,56"/>
+      <rect x="52" y="12" width="4" height="4" fill="#78350f"/>
+    </svg>
+
+    <!-- Eraser -->
+    <svg class="floating-icon" style="left: 50vw; animation-delay: 6s; width: 40px; height: 40px;" viewBox="0 0 64 64" >
+      <rect x="8" y="32" width="40" height="20" rx="4" ry="4" fill="#f87171"/>
+      <rect x="40" y="32" width="16" height="20" rx="4" ry="4" fill="#ddd6fe"/>
+      <line x1="40" y1="32" x2="40" y2="52" stroke="#7c3aed" stroke-width="2"/>
+    </svg>
+
+    <!-- Paper Plane -->
+    <svg class="floating-icon" style="left: 70vw; animation-delay: 9s; width: 35px; height: 35px;" viewBox="0 0 64 64">
+      <polygon fill="#60a5fa" points="2,30 62,2 48,62 30,48 2,30"/>
+      <polyline points="30,48 48,62" fill="none" stroke="#1e40af" stroke-width="2"/>
+    </svg>
+
+  </div>
+
+  <div class="container">
+
+    <!-- Book icon top-left -->
+    <div style="position:absolute; top:12px; left:12px; width:36px; height:36px; z-index: 11;">
+      <svg viewBox="0 0 64 64" fill="#2563eb" xmlns="http://www.w3.org/2000/svg" width="36" height="36" aria-label="Book icon" role="img">
+        <rect x="12" y="10" width="40" height="44" rx="4" ry="4" stroke="#1e40af" stroke-width="2" fill="#3b82f6"/>
+        <line x1="20" y1="20" x2="44" y2="20" stroke="#bfdbfe" stroke-width="2"/>
+        <line x1="20" y1="28" x2="44" y2="28" stroke="#bfdbfe" stroke-width="2"/>
+        <line x1="20" y1="36" x2="44" y2="36" stroke="#bfdbfe" stroke-width="2"/>
+        <line x1="20" y1="44" x2="44" y2="44" stroke="#bfdbfe" stroke-width="2"/>
+      </svg>
+    </div>
+
+    <!-- Eraser icon bottom-right -->
+    <div style="position:absolute; bottom:10px; right:10px; width:50px; height:50px; z-index: 11;">
+      <svg viewBox="0 0 64 64" fill="#f87171" xmlns="http://www.w3.org/2000/svg" width="50" height="50" aria-label="Eraser icon" role="img">
+        <rect x="8" y="32" width="40" height="20" rx="4" ry="4" fill="#f87171"/>
+        <rect x="40" y="32" width="16" height="20" rx="4" ry="4" fill="#ddd6fe"/>
+        <line x1="40" y1="32" x2="40" y2="52" stroke="#7c3aed" stroke-width="2"/>
+      </svg>
+    </div>
+
+    <h1>Welcome to NovaeClass</h1>
+    <p class="subtitle">Empowering students and parents through connected learning</p>
+
+    <div class="login-links">
+      <a href="/student/login/">Student</a>
+      <a href="/parent/login/">Parent</a>
+    </div>
+
+    <div class="footer">&copy; 2025 NovaeClass. All rights reserved.</div>
+  </div>
+
+</body>
+</html>

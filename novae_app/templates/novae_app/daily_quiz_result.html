@@ -1,0 +1,26 @@
+<!-- templates/core/daily_quiz_result.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Quiz Result</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; }
+        .correct { color: green; font-weight: bold; }
+        .incorrect { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Quiz Result</h1>
+    <p class="question">{{ question.question_text }}</p>
+    <p>Your answer: {{ selected_option }}</p>
+
+    {% if correct %}
+        <p class="correct">Correct! 🎉</p>
+    {% else %}
+        <p class="incorrect">Incorrect. The right answer is {{ question.correct_option }}.</p>
+    {% endif %}
+
+    <a href="{% url 'daily_quiz' %}">Try another quiz</a>
+</body>
+</html>

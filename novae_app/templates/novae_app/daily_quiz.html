@@ -1,0 +1,30 @@
+<!-- templates/core/daily_quiz.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Daily Quiz</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; }
+        .question { font-size: 1.5rem; margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; cursor: pointer; }
+        button { padding: 10px 15px; font-size: 1rem; }
+    </style>
+</head>
+<body>
+    {% if error %}
+        <p>{{ error }}</p>
+    {% else %}
+        <h1>Daily Quiz</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="question">{{ question.question_text }}</div>
+            <label><input type="radio" name="option" value="A" required> A. {{ question.option_a }}</label>
+            <label><input type="radio" name="option" value="B"> B. {{ question.option_b }}</label>
+            <label><input type="radio" name="option" value="C"> C. {{ question.option_c }}</label>
+            <label><input type="radio" name="option" value="D"> D. {{ question.option_d }}</label>
+            <button type="submit">Submit Answer</button>
+        </form>
+    {% endif %}
+</body>
+</html>
