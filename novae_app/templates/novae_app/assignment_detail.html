@@ -1,59 +1,59 @@
-<h1>{{ instance.assignment.title }}</h1>
-<p>Due Date: {{ instance.assignment.due_date }}</p>
+{% load static %}
 
-{% if instance.completed %}
-    <p>Score: {{ instance.score|default:"Not graded yet" }}</p>
-    <a href="{% url 'download_graded_assignment_docx' instance.id %}">Download Graded Assignment</a>
+{% block title %}{{ instance.assignment.title }}{% endblock %}
 
-    <h3>Questions & Your Answers</h3>
-    <ol>
-        {% for question in questions %}
-            <li>
-                <p><strong>{{ question.question_text }}</strong></p>
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ instance.assignment.title }}</h1>
+    <p><strong>Due Date:</strong> {{ instance.assignment.due_date }}</p>
+    <p>{{ instance.assignment.description|default:"No description provided." }}</p>
 
-                {% with answer=answers_by_question_id|default:{} %}
-                    {% with answer=answer|get_item:question.id %}
-                        {% if question.is_text_answer %}
-                            <p>Your Answer: {{ answer.text_answer|default:"Not answered" }}</p>
-                            {% if answer.is_correct %}
-                                <span style="color:green">Correct ✅</span>
+    {% if instance.completed %}
+        <div class="alert alert-success">
+            <strong>Assignment Completed!</strong> Your score: {{ instance.score }}%
+        </div>
+        <a href="{% url 'graded_assignment_download' instance.id %}" class="btn btn-primary">
+            Download Graded Assignment
+        </a>
+    {% else %}
+        <form method="post">
+            {% csrf_token %}
+            {% if questions %}
+                <ol>
+                    {% for question in questions %}
+                        <li class="mb-4">
+                            <p>{{ question.question_text }}</p>
+
+                            {% if question.is_text_answer %}
+                                <!-- Text answer -->
+                                <textarea class="form-control" name="question_{{ question.id }}" rows="4" placeholder="Type your answer here..." required></textarea>
                             {% else %}
-                                <span style="color:red">Incorrect ❌</span>
+                                <!-- Multiple choice -->
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}a" value="A" required>
+                                    <label class="form-check-label" for="q{{ question.id }}a">{{ question.option_a }}</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}b" value="B">
+                                    <label class="form-check-label" for="q{{ question.id }}b">{{ question.option_b }}</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}c" value="C">
+                                    <label class="form-check-label" for="q{{ question.id }}c">{{ question.option_c }}</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}d" value="D">
+                                    <label class="form-check-label" for="q{{ question.id }}d">{{ question.option_d }}</label>
+                                </div>
                             {% endif %}
-                        {% else %}
-                            <p>Your Answer: {{ answer.selected_option|default:"Not answered" }}</p>
-                            {% if answer.is_correct %}
-                                <span style="color:green">Correct ✅</span>
-                            {% else %}
-                                <span style="color:red">Incorrect ❌</span>
-                            {% endif %}
-                        {% endif %}
-                    {% endwith %}
-                {% endwith %}
-            </li>
-        {% endfor %}
-    </ol>
-
-{% else %}
-    <form method="post">
-        {% csrf_token %}
-        <ol>
-            {% for question in questions %}
-                <li>
-                    <p>{{ question.question_text }}</p>
-                    {% if question.is_text_answer %}
-                        <textarea name="question_{{ question.id }}" rows="4" placeholder="Type your answer here..."></textarea>
-                    {% else %}
-                        {% for opt in "ABCD" %}
-                            <div>
-                                <input type="radio" name="question_{{ question.id }}" value="{{ opt }}" id="q{{ question.id }}{{ opt }}">
-                                <label for="q{{ question.id }}{{ opt }}">{{ question|get_option_text:opt }}</label>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ol>
-        <button type="submit">Submit Assignment</button>
-    </form>
-{% endif %}
+                        </li>
+                    {% endfor %}
+                </ol>
+                <button type="submit" class="btn btn-success mt-3">Submit Assignment</button>
+            {% else %}
+                <p>No questions are available for this assignment.</p>
+            {% endif %}
+        </form>
+    {% endif %}
+</div>
+{% endblock %}
