@@ -214,7 +214,7 @@ def student_assignment_detail(request, instance_id):
     """
     student = request.user.student_profile
     instance = get_object_or_404(AssignmentInstance, id=instance_id, student=student)
-@@ -240,18 +240,21 @@
+
                 student_answer.text_answer = answer_text
             elif question.question_type == 'MC':
                 student_answer.selected_option = answer_text
@@ -238,7 +238,7 @@ def student_assignment_detail(request, instance_id):
                     correct_answers += 1
 
         # -----------------------
-@@ -269,456 +272,455 @@
+
         'questions': questions,
         'answers_by_question_id': answers_by_question_id,
     })
