@@ -85,7 +85,7 @@ class ParentProfile(models.Model):
 class Assignment(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    due_date = models.DateField(null=True, blank=True)
+    due_date = models.DateField()
     grade_level = models.CharField(
         max_length=10,
         choices=GRADE_LEVEL_CHOICES,
