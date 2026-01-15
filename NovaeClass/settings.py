@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "novae_app",
+   'import_export',
+
 ]
 
 AUTH_USER_MODEL = "novae_app.User"
