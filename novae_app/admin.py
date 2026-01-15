@@ -57,7 +57,7 @@ class AssignmentAdminForm(forms.ModelForm):
 
     class Meta:
         model = Assignment
-        fields = ['title', 'description', 'due_date', 'grade_level']
+        fields = ['title', 'description','grade_level']
 
 
 # ---------------------------
@@ -72,7 +72,7 @@ class QuestionInline(admin.TabularInline):
 
 
 @admin.register(Assignment)
-class AssignmentAdmin(admin.ModelAdmin):
+class AssignmentAdmin(ImportExportModelAdmin):
     form = AssignmentAdminForm
     list_display = ('title', 'grade_level', 'due_date')
     list_filter = ('due_date', 'grade_level')
@@ -91,7 +91,7 @@ class AssignmentAdmin(admin.ModelAdmin):
 # AssignmentInstance admin
 # ---------------------------
 @admin.register(AssignmentInstance)
-class AssignmentInstanceAdmin(admin.ModelAdmin):
+class AssignmentInstanceAdmin(ImportExportModelAdmin):
     list_display = ('assignment', 'student', 'score', 'completed')
     list_filter = ('completed', 'assignment__grade_level')
     search_fields = ('assignment__title', 'student__user__username')
