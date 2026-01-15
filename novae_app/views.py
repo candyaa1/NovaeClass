@@ -122,7 +122,7 @@ def student_dashboard(request):
 
 # ---------------------------
 # STUDENT ASSIGNMENTS WITH PROGRESSIVE LOCKING
-# ---------------------------
+# --------------------------
 from datetime import date
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
