@@ -59,7 +59,7 @@ class AssignmentAdminForm(forms.ModelForm):
 
     class Meta:
         model = Assignment
-        fields = ['title', 'description','grade_level']
+        fields = ['title', 'description', 'due_date','grade_level']
 
 
 # ---------------------------
