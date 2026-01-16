@@ -17,6 +17,7 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
     path('landing/', landing, name='landing'),
     path('about/', views.about_us, name='about_us'),
+    path("coming-soon/", coming_soon, name="coming_soon"),
 
     # ---------------------------
     # Student URLs
