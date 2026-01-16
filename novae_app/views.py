@@ -724,3 +724,5 @@ def submit_assignment(request, assignment_id):
         'assignment': assignment,
         'form': form
     })
+def coming_soon(request):
+    return render(request, "coming_soon.html")
