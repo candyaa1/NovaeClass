@@ -5,6 +5,8 @@ from .views import get_grades
 from .views import student_signup
 from django.shortcuts import redirect
 from .views import landing
+from .views import coming_soon
+
 #replace coming_soon with return redirect('student_signup')  # Redirect to the signup page
 #
 # Simple redirect view for the homepage
