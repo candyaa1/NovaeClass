@@ -29,9 +29,10 @@ class UserAdmin(admin.ModelAdmin):
 # ---------------------------
 @admin.register(StudentProfile)
 class StudentProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'grade')
-    list_filter = ('grade',)
+    list_display = ('user', 'grade', 'is_demo')
+    list_filter = ('grade', 'is_demo')
     search_fields = ('user__username', 'user__email')
+
 
 
 # ---------------------------
