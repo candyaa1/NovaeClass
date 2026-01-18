@@ -312,7 +312,17 @@ class StudySession(models.Model):
         if self.logout_time:
             return (self.logout_time - self.login_time).total_seconds()
         return 0
+class Material(models.Model):
+    title = models.CharField(max_length=200)
+    file_url = models.URLField()
+    grade_level = models.CharField(
+        max_length=4,
+        choices=GRADE_LEVEL_CHOICES,
+        default='K',
+    )
 
+    def __str__(self):
+        return f"{self.title} ({self.get_grade_level_display()})"
 
 class StudentDailyTime(models.Model):
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
