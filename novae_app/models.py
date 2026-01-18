@@ -253,14 +253,16 @@ class Question(models.Model):
     def __str__(self):
         return self.question_text[:50]
 # --------------------------- # Game # --------------------------- class 
-Game(models.Model): 
-    title = models.CharField(max_length=100) 
-    description = models.TextField() 
-    url = models.URLField() 
-    min_grade = models.IntegerField() 
-    max_grade = models.IntegerField() 
-    def __str__(self): 
-    return self.title
+class Game(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    url = models.URLField()
+    min_grade = models.IntegerField()
+    max_grade = models.IntegerField()
+
+    def __str__(self):
+        return self.title
+
 
 # ---------------------------
 # Student Answer
