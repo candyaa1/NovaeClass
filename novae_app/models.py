@@ -338,3 +338,50 @@ class StudentDailyTime(models.Model):
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
     date = models.DateField()
     time_seconds = models.PositiveIntegerField(default=0)
+
+class AssignmentInstance(models.Model):
+    assignment = models.ForeignKey(
+        Assignment,
+        on_delete=models.CASCADE,
+        related_name='instances'
+    )
+    student = models.ForeignKey(
+        StudentProfile,
+        on_delete=models.CASCADE,
+        related_name='assignments'
+    )
+    completed = models.BooleanField(default=False)
+    score = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+    feedback = models.TextField(blank=True, null=True)
+    attempts = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('assignment', 'student')
+
+    def __str__(self):
+        return f"{self.assignment.title} - {self.student.user.username}"
+
+    # ---------------------------
+    # Retake logic
+    # ---------------------------
+    def retake_allowed(self):
+        """
+        Return True if student can retake this assignment (score < 75).
+        """
+        return self.score is not None and self.score < 75
+
+    def start_retake(self):
+        """
+        Prepare this instance for a retake.
+        """
+        self.completed = False
+        self.score = None
+        self.feedback = ""
+        self.attempts += 1
+        self.save()
+
