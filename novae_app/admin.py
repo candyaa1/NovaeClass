@@ -76,10 +76,22 @@ class QuestionInline(admin.TabularInline):
 @admin.register(Assignment)
 class AssignmentAdmin(ImportExportModelAdmin):
     form = AssignmentAdminForm
-    list_display = ('title', 'grade_level', 'due_date')
-    list_filter = ('due_date', 'grade_level')
+    list_display = (
+        'title',
+        'grade_level',
+        'due_date',
+        'is_demo',
+        'is_sample',
+    )
+    list_filter = (
+        'grade_level',
+        'due_date',
+        'is_demo',
+        'is_sample',
+    )
     search_fields = ('title',)
-    inlines = [QuestionInline]  # Add questions inline
+    inlines = [QuestionInline]
+
 
     def save_model(self, request, obj, form, change):
         """
@@ -104,8 +116,18 @@ class AssignmentInstanceAdmin(ImportExportModelAdmin):
 # ---------------------------
 @admin.register(Material)
 class MaterialAdmin(admin.ModelAdmin):
-    list_display = ('title', 'grade_level', 'file_url')
-    list_filter = ('grade_level',)
+    list_display = (
+        'title',
+        'grade_level',
+        'is_demo',
+        'is_sample',
+        'file_url',
+    )
+    list_filter = (
+        'grade_level',
+        'is_demo',
+        'is_sample',
+    )
     search_fields = ('title',)
 
 
@@ -127,9 +149,19 @@ class QuestionAdmin(admin.ModelAdmin):
 # ---------------------------
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
-    list_display = ('title', 'min_grade', 'max_grade')
-    list_filter = ('min_grade', 'max_grade')
+    list_display = (
+        'title',
+        'min_grade',
+        'max_grade',
+        'is_demo',
+    )
+    list_filter = (
+        'min_grade',
+        'max_grade',
+        'is_demo',
+    )
     search_fields = ('title',)
+
 
 
 # ---------------------------
