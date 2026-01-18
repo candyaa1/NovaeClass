@@ -79,38 +79,62 @@ def student_dashboard(request):
         student.last_active_date = today
 
     student.daily_time_seconds += int(elapsed_seconds)
+    student.last_active_date = today
     student.save()
     request.session['session_start'] = now.timestamp()
 
-    if not paid:
-        return render(request, 'novae_app/student_dashboard.html', {
-            'demo': True,
-            'assignments': [],
-            'grades': [],
-            'materials': [],
-            'total_time_spent': timedelta(seconds=student.daily_time_seconds),
-        })
+    # ------------------------
+    # Choose assignments based on demo vs paid
+    # ------------------------
+    if paid:
+        assignments_queryset = Assignment.objects.all()
+    else:
+        assignments_queryset = Assignment.objects.filter(is_demo=True)
 
-    for assignment in Assignment.objects.all():
+    # Ensure AssignmentInstances exist
+    for assignment in assignments_queryset:
         AssignmentInstance.objects.get_or_create(
             student=student,
             assignment=assignment
         )
 
-    assignments = AssignmentInstance.objects.filter(
-        student=student, completed=False
-    ).order_by('assignment__due_date')
+    # ------------------------
+    # Fetch assignments / grades / materials
+    # ------------------------
+    if paid:
+        assignments = AssignmentInstance.objects.filter(
+            student=student, completed=False
+        ).order_by('assignment__due_date')
 
-    grades = AssignmentInstance.objects.filter(
-        student=student, completed=True, score__isnull=False
-    )
+        grades = AssignmentInstance.objects.filter(
+            student=student, completed=True, score__isnull=False
+        )
 
-    materials = Material.objects.filter(grade_level=student.grade)
+        materials = Material.objects.filter(grade_level=student.grade)
+    else:
+        assignments = AssignmentInstance.objects.filter(
+            student=student,
+            assignment__is_demo=True,
+            completed=False
+        ).order_by('assignment__due_date')
+
+        grades = AssignmentInstance.objects.filter(
+            student=student,
+            assignment__is_demo=True,
+            completed=True,
+            score__isnull=False
+        )
+
+        materials = Material.objects.filter(
+            grade_level=student.grade,
+            is_demo=True
+        )
 
     return render(request, 'novae_app/student_dashboard.html', {
         'assignments': assignments,
         'grades': grades,
         'materials': materials,
+        'demo': not paid,
         'total_time_spent': timedelta(seconds=student.daily_time_seconds),
     })
 
