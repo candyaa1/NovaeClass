@@ -11,7 +11,7 @@ from .views import coming_soon
 #
 # Simple redirect view for the homepage
 def home_redirect(request):
-    return redirect('novae_app/student_signup.html')  # Redirect to the signup page
+    return redirect('student_signup')  # Redirect to the signup page
 urlpatterns = [
     # ---------------------------
     # Landing & Logout
