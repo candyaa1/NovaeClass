@@ -1,0 +1,21 @@
+<h1>{{ assignment.title }}</h1>
+
+<p>{{ assignment.description }}</p>
+
+<hr>
+
+<h3>Preview Questions</h3>
+
+{% for question in questions %}
+  <div class="question">
+    <p>{{ forloop.counter }}. {{ question.text }}</p>
+  </div>
+{% empty %}
+  <p>No questions available.</p>
+{% endfor %}
+
+<hr>
+
+<p style="color: gray;">
+  This is a free preview. Upgrade to unlock full access.
+</p>
