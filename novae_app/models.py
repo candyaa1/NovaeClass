@@ -171,11 +171,12 @@ class Assignment(models.Model):
         blank=True,
         null=True
     )
+    # ✅ New fields
+    is_demo = models.BooleanField(default=False)
+    is_sample = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
-
-
 # ---------------------------
 # Assignment Instance
 # ---------------------------
