@@ -673,19 +673,30 @@ def billing_view(request):
     )
 
 
+
+
 def assignment_preview(request, assignment_id):
-    assignment = get_object_or_404(Assignment, pk=assignment_id)
+    assignment = get_object_or_404(Assignment, id=assignment_id)
+    questions = assignment.questions.all()
 
-    # Get related questions
-    questions = assignment.questions.prefetch_related('choice_set')  # prefetch choices
+    # Build a list of options for each question
+    question_data = []
+    for q in questions:
+        options = []
+        if q.option_a:
+            options.append(q.option_a)
+        if q.option_b:
+            options.append(q.option_b)
+        if q.option_c:
+            options.append(q.option_c)
+        if q.option_d:
+            options.append(q.option_d)
+        question_data.append({
+            "question": q,
+            "options": options
+        })
 
-    # Get materials if field exists
-    materials = getattr(assignment, 'materials', None)
-    if materials:
-        materials = assignment.materials.all()
-
-    return render(request, 'assignment_preview.html', {
-        'assignment': assignment,
-        'questions': questions,
-        'materials': materials,
+    return render(request, "assignment_preview.html", {
+        "assignment": assignment,
+        "question_data": question_data,
     })
