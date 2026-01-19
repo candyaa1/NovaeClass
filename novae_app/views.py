@@ -572,4 +572,19 @@ def assignment_results(request, child_name):
 
     return render(request, 'novae_app/assignment_results.html', {'assignments_data': assignments_data})
 
+class ParentSignUpForm(forms.Form):
+    """Form for parent signup."""
+    username = forms.CharField(
+        max_length=150,
+        label="Username",
+        widget=forms.TextInput(attrs={'placeholder': 'Username'})
+    )
+    email = forms.EmailField(
+        label="Email",
+        widget=forms.EmailInput(attrs={'placeholder': 'Email'})
+    )
+    password = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput(attrs={'placeholder': 'Password'})
+    )
 
