@@ -651,34 +651,39 @@ from django.db.models import Q
 from .models import Assignment
 
 
+
 @login_required
 def billing_view(request):
+    """
+    Parent billing page.
+    Shows free trial (demo/sample) assignments.
+    """
+
     free_trial_assignments = Assignment.objects.filter(
         Q(is_demo=True) | Q(is_sample=True)
-    ).select_related("course")
-
-    context = {
-        "free_trial_assignments": free_trial_assignments,
-        "current_plan": "Free Trial",
-    }
-
-    return render(request, "billing.html", context)
-
-
-from django.shortcuts import render, get_object_or_404
-from .models import Assignment
-
-
-def assignment_preview(request, assignment_id):
-    assignment = get_object_or_404(
-        Assignment,
-        id=assignment_id,
-        is_demo=True
-    ) | get_object_or_404(
-        Assignment,
-        id=assignment_id,
-        is_sample=True
     )
+
+    return render(
+        request,
+        "billing.html",
+        {
+            "current_plan": "Free Trial",
+            "free_trial_assignments": free_trial_assignments,
+        }
+    )
+
+
+@login_required
+def assignment_preview(request, assignment_id):
+    """
+    Read-only preview for free trial assignments only.
+    """
+
+    assignment = get_object_or_404(Assignment, id=assignment_id)
+
+    # HARD BLOCK non-free content
+    if not assignment.is_demo and not assignment.is_sample:
+        return render(request, "upgrade_required.html")
 
     questions = assignment.questions.all()
 
@@ -690,4 +695,3 @@ def assignment_preview(request, assignment_id):
             "questions": questions,
         }
     )
-
