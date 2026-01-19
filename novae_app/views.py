@@ -377,6 +377,17 @@ def student_signup(request):
                     student_profile = StudentProfile.objects.create(user=child_user, grade=grade)
                     parent_profile.children.add(student_profile)
             return redirect('landing')
+    else:
+        parent_form = ParentSignUpForm()
+        child_formset = ChildFormSet()
+
+    # Return the form for GET requests or invalid POST
+    return render(request, 'novae_app/student_signup.html', {
+        'parent_form': parent_form,
+        'child_formset': child_formset,
+    })
+
+    
 def submit_assignment(request, assignment_id):
     assignment = get_object_or_404(Assignment, id=assignment_id)
     student = get_object_or_404(StudentProfile, user=request.user)
