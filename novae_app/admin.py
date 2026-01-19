@@ -69,31 +69,36 @@ class QuestionInline(admin.TabularInline):
     model = Question
     extra = 0
 
+
+
 @admin.register(Assignment)
 class AssignmentAdmin(ImportExportModelAdmin):
     form = AssignmentAdminForm
     list_display = (
         'title',
+        'course',     # ✅ show course to avoid confusion
         'grade_level',
         'due_date',
-        'is_demo',   # ✅ Works now
-        'is_sample', # ✅ Works now
+        'is_demo',
+        'is_sample',
     )
     list_filter = (
+        'course',     # ✅ filter by course
         'grade_level',
         'due_date',
-        'is_demo',   # ✅ Works now
-        'is_sample', # ✅ Works now
+        'is_demo',
+        'is_sample',
     )
-    search_fields = ('title',)
+    search_fields = ('title', 'description')
     inlines = [QuestionInline]
 
     def save_model(self, request, obj, form, change):
         """
         Save the assignment.
-        Auto-assign to students is now handled by signals when students are created or updated.
+        Auto-assign to students handled by signals.
         """
         super().save_model(request, obj, form, change)
+
 # ---------------------------
 # AssignmentInstance admin
 # ---------------------------
