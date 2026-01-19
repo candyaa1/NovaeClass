@@ -644,5 +644,5 @@ def student_assignment_retake(request, instance_id):
 
 def billing_view(request):
     # Example: render a billing page template
-    return render(request, 'billing.html')
+    return render(request, 'novae_app/billing.html')
 
