@@ -646,20 +646,20 @@ def student_assignment_retake(request, instance_id):
 from django.shortcuts import render
 from .models import BillingProfile, Course, Material
 
-def billing_view(request):
-    user = request.user
-    billing_profile = None
-    free_trial_items = []
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from .models import Assignment
 
-    if hasattr(user, 'billingprofile'):
-        billing_profile = user.billingprofile
-        # If the user is on a free trial, show free trial items
-        if billing_profile.plan == 'free_trial':
-            # Example: show free courses or free materials
-            free_trial_items = Course.objects.filter(is_demo=True) | Material.objects.filter(is_demo=True)
+
+@login_required
+def billing_view(request):
+    free_trial_assignments = Assignment.objects.filter(
+        Q(is_demo=True) | Q(is_sample=True)
+    ).select_related("course")
 
     context = {
-        'billing_profile': billing_profile,
-        'free_trial_items': free_trial_items,
+        "free_trial_assignments": free_trial_assignments,
+        "current_plan": "Free Trial",
     }
-    return render(request, 'billing.html', context)
+
+    return render(request, "billing.html", context)
