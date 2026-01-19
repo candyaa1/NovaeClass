@@ -169,6 +169,13 @@ class StudyPlanAdmin(admin.ModelAdmin):
 
 
 
+from .models import Course
+
+
+@admin.register(Course)
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ("id", "title")
+    search_fields = ("title",)
 
 
 
