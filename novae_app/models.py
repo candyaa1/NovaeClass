@@ -260,9 +260,11 @@ class Game(models.Model):
     url = models.URLField()
     min_grade = models.IntegerField()
     max_grade = models.IntegerField()
+    is_demo = models.BooleanField(default=False)  # ✅ add this if you need it
 
     def __str__(self):
         return self.title
+
 
 
 # ---------------------------
