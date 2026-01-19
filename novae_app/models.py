@@ -129,6 +129,7 @@ class StudentProfile(models.Model):
 
     daily_time_seconds = models.PositiveIntegerField(default=0)
     last_active_date = models.DateField(default=date.today)
+    is_demo = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
@@ -232,6 +233,8 @@ class Question(models.Model):
         on_delete=models.CASCADE,
         related_name='questions'
     )
+    is_text_answer = models.BooleanField(default=True)
+
     question_text = models.TextField()
     question_type = models.CharField(
         max_length=5,
@@ -318,6 +321,9 @@ class StudySession(models.Model):
 class Material(models.Model):
     title = models.CharField(max_length=200)
     file_url = models.URLField()
+    is_demo = models.BooleanField(default=False)
+    is_sample = models.BooleanField(default=False)
+
     grade_level = models.CharField(
         max_length=4,
         choices=GRADE_LEVEL_CHOICES,
@@ -367,4 +373,5 @@ class StudyPlan(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.user.username})"
+
 
