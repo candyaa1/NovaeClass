@@ -11,6 +11,7 @@ from .models import (
     Material,
     Question,
     Game,
+    Course,
     StudyPlan
 )
 
