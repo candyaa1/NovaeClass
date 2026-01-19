@@ -154,6 +154,13 @@ def student_assignments(request):
         'assignments': instances
     })
 
+@login_required
+def student_assignment_retake(request, instance_id):
+    instance = get_object_or_404(AssignmentInstance, id=instance_id, student=request.user.student_profile)
+    if not instance.retake_allowed():
+        return redirect('student_assignments')
+    instance.start_retake()
+    return redirect('student_assignment_detail', instance_id=instance.id)
 
 # ---------------------------
 # ASSIGNMENT DETAIL
@@ -318,6 +325,74 @@ def download_assignment_docx(request, pk):
     response['Content-Disposition'] = f'attachment; filename="{assignment.title}.docx"'
     doc.save(response)
     return response
+@login_required
+def student_grades(request):
+    student = request.user.student_profile
+    grades = AssignmentInstance.objects.filter(student=student, score__isnull=False)
+    return render(request, 'novae_app/student_grades.html', {'grades': grades})
+
+@login_required
+def get_grades(request, child_id):
+    try:
+        student = StudentProfile.objects.get(user__id=child_id)
+    except StudentProfile.DoesNotExist:
+        return JsonResponse({"error": "Student not found"}, status=404)
+    grades = AssignmentInstance.objects.filter(student=student, score__isnull=False)
+    grades_data = [{
+        'assignment': g.assignment.title,
+        'score': g.score,
+        'comments': g.feedback or 'No feedback available',
+    } for g in grades]
+    return JsonResponse({'grades': grades_data})
+@login_required
+def parent_submitted_assignments(request, student_id):
+    parent = request.user.parent_profile
+    student = get_object_or_404(StudentProfile, id=student_id, parents=parent)
+    assignments = AssignmentInstance.objects.filter(student=student, score__isnull=False)
+    return render(request, 'novae_app/student_grades.html', {'student': student, 'grades': assignments})
+@never_cache
+def student_signup(request):
+    if request.method == 'POST':
+        parent_form = ParentSignUpForm(request.POST)
+        child_formset = ChildFormSet(request.POST)
+        if parent_form.is_valid() and child_formset.is_valid():
+            parent_user = User.objects.create_user(
+                username=parent_form.cleaned_data['username'],
+                email=parent_form.cleaned_data['email'],
+                password=parent_form.cleaned_data['password'],
+                role='parent'
+            )
+            parent_profile = ParentProfile.objects.create(user=parent_user)
+            for child_form in child_formset:
+                username = child_form.cleaned_data.get('username')
+                grade = child_form.cleaned_data.get('grade')
+                password = child_form.cleaned_data.get('password')
+                if username and grade and password:
+                    child_user = User.objects.create_user(username=username, password=password, role='student')
+                    student_profile = StudentProfile.objects.create(user=child_user, grade=grade)
+                    parent_profile.children.add(student_profile)
+            return redirect('landing')
+def submit_assignment(request, assignment_id):
+    assignment = get_object_or_404(Assignment, id=assignment_id)
+    student = get_object_or_404(StudentProfile, user=request.user)
+    questions = assignment.questions.all()
+    if request.method == "POST":
+        form = AssignmentSubmissionForm(questions, request.POST)
+        if form.is_valid():
+            for question in questions:
+                answer_value = form.cleaned_data.get(f'q_{question.id}')
+                StudentAnswer.objects.create(
+                    student=student,
+                    question=question,
+                    answer_text=answer_value if question.is_text_answer else None,
+                    selected_option=answer_value if not question.is_text_answer else None
+                )
+            return redirect('assignment_success')
+def coming_soon(request):
+    return render(request, "coming_soon.html")
+
+def about_us(request):
+    return render(request, 'about_us.html')
 
 
 # ---------------------------
