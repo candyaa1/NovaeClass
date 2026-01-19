@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django import forms
 from django.forms import formset_factory
+from django .db import transaction
 
 from django.views.decorators.cache import never_cache
 from datetime import timedelta, date
@@ -364,28 +365,28 @@ def student_signup(request):
         parent_form = ParentSignUpForm(request.POST)
         child_formset = ChildFormSet(request.POST)
         if parent_form.is_valid() and child_formset.is_valid():
-            parent_user = User.objects.create_user(
-                username=parent_form.cleaned_data['username'],
-                email=parent_form.cleaned_data['email'],
-                password=parent_form.cleaned_data['password'],
-                role='parent'
-            )
-            parent_profile = ParentProfile.objects.create(user=parent_user)
-            for child_form in child_formset:
-                username = child_form.cleaned_data.get('username')
-                grade = child_form.cleaned_data.get('grade')
-                password = child_form.cleaned_data.get('password')
-                if username and grade and password:
-                    child_user = User.objects.create_user(username=username, password=password, role='student')
-                    student_profile = StudentProfile.objects.create(user=child_user, grade=grade)
-                    parent_profile.children.add(student_profile)
+            with transaction.atomic():
+                parent_user = User.objects.create_user(
+                    username=parent_form.cleaned_data['username'],
+                    email=parent_form.cleaned_data['email'],
+                    password=parent_form.cleaned_data['password'],
+                    role='parent'
+                )
+                parent_profile = ParentProfile.objects.create(user=parent_user)
+                for child_form in child_formset:
+                    username = child_form.cleaned_data.get('username')
+                    grade = child_form.cleaned_data.get('grade')
+                    password = child_form.cleaned_data.get('password')
+                    if username and grade and password:
+                        child_user = User.objects.create_user(username=username, password=password, role='student')
+                        student_profile = StudentProfile.objects.create(user=child_user, grade=grade)
+                        parent_profile.children.add(student_profile)
             return redirect('landing')
     else:
         parent_form = ParentSignUpForm()
         child_formset = ChildFormSet()
 
-    # Return the form for GET requests or invalid POST
-    return render(request, 'novae_app/student_signup.html', {
+    return render(request, "student_signup/student_signup.html", {
         'parent_form': parent_form,
         'child_formset': child_formset,
     })
