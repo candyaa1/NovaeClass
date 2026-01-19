@@ -8,7 +8,17 @@
 
 {% for question in questions %}
   <div class="question">
-    <p>{{ forloop.counter }}. {{ question.text }}</p>
+    <p><strong>{{ forloop.counter }}. {{ question.text }}</strong></p>
+
+    {% if question.choice_set.all %}
+      <ul>
+        {% for choice in question.choice_set.all %}
+          <li>{{ choice.text }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p><em>No choices for this question.</em></p>
+    {% endif %}
   </div>
 {% empty %}
   <p>No questions available.</p>
