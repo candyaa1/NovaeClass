@@ -164,8 +164,8 @@ class Assignment(models.Model):
         Course,
         on_delete=models.CASCADE,
         related_name="assignments",
-        null=False,      # must belong to a course
-        blank=False
+        null=True,   # allow null in database
+        blank=True   # allow blank in forms/admin
     )
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -176,8 +176,6 @@ class Assignment(models.Model):
         blank=True,
         null=True
     )
-
-    # ✅ New fields for free trial / sample
     is_demo = models.BooleanField(default=False)
     is_sample = models.BooleanField(default=False)
 
