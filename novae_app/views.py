@@ -662,4 +662,4 @@ def billing_view(request):
         'billing_profile': billing_profile,
         'free_trial_items': free_trial_items,
     }
-    return render(request, 'novae_app/billing.html', context)
+    return render(request, 'billing.html', context)
