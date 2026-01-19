@@ -445,3 +445,18 @@ def study_plan_edit(request, pk):
 
     return render(request, 'novae_app/study_plan_form.html', {'form': form})
 
+
+@login_required
+def study_plan_delete(request, pk):
+    if not user_is_paid(request.user):
+        return redirect('billing')
+
+    plan = get_object_or_404(StudyPlan, id=pk, user=request.user)
+
+    if request.method == 'POST':
+        plan.delete()
+        return redirect('study_plan_list')
+
+    return render(request, 'novae_app/study_plan_confirm_delete.html', {'plan': plan})
+
+
