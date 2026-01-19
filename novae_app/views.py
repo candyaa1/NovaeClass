@@ -663,3 +663,31 @@ def billing_view(request):
     }
 
     return render(request, "billing.html", context)
+
+
+from django.shortcuts import render, get_object_or_404
+from .models import Assignment
+
+
+def assignment_preview(request, assignment_id):
+    assignment = get_object_or_404(
+        Assignment,
+        id=assignment_id,
+        is_demo=True
+    ) | get_object_or_404(
+        Assignment,
+        id=assignment_id,
+        is_sample=True
+    )
+
+    questions = assignment.questions.all()
+
+    return render(
+        request,
+        "assignment_preview.html",
+        {
+            "assignment": assignment,
+            "questions": questions,
+        }
+    )
+
