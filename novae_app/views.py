@@ -525,3 +525,9 @@ def achievements(request):
     """Render the achievements page for the logged-in user."""
     return render(request, 'novae_app/achievements.html')
 
+@login_required
+def study_timer(request):
+    """Render the study timer page for the logged-in user."""
+    return render(request, 'novae_app/study_timer.html')
+
+
