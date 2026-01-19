@@ -460,23 +460,6 @@ def study_plan_delete(request, pk):
     return render(request, 'novae_app/study_plan_confirm_delete.html', {'plan': plan})
 
 
-@login_required
-def download_assignment_docx(request, pk):
-    assignment = get_object_or_404(Assignment, id=pk)
-
-    doc = Document()
-    doc.add_heading(assignment.title, level=1)
-    doc.add_paragraph(f"Due Date: {assignment.due_date}")
-    doc.add_paragraph("Description:")
-    doc.add_paragraph(assignment.description or "No description provided.")
-
-    response = HttpResponse(
-        content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    )
-    response['Content-Disposition'] = f'attachment; filename="{assignment.title}.docx"'
-    doc.save(response)
-    return response
-
 
 # ---------------------------
 # DOWNLOAD GRADED ASSIGNMENT DOCX
