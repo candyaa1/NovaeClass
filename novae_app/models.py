@@ -261,7 +261,7 @@ class Question(models.Model):
 
     def __str__(self):
         return self.question_text[:50]
-# --------------------------- # Game # --------------------------- class 
+# --------------------------- # Game # --------------------------- 
 class Game(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
