@@ -530,4 +530,48 @@ def study_timer(request):
     """Render the study timer page for the logged-in user."""
     return render(request, 'novae_app/study_timer.html')
 
+@login_required
+def assignment_results(request, child_name):
+    """
+    Render assignment results page for a specific student.
+    """
+    # Fetch the student user
+    student_user = get_object_or_404(User, username=child_name)
+
+    # Fetch student profile
+    student = get_object_or_404(StudentProfile, user=student_user)
+
+    # Fetch all AssignmentInstances for this student
+    assignments_instances = AssignmentInstance.objects.filter(student=student)
+
+    if not assignments_instances.exists():
+        return render(request, 'novae_app/assignment_results.html', {'error': 'No assignments found'})
+
+    assignments_data = []
+
+    for instance in assignments_instances:
+        questions = instance.assignment.questions.all()  # Assuming related_name='questions' in Assignment
+        answers = Answer.objects.filter(assignment_instance=instance)  # Assuming Answer model exists
+
+        assignment_data = {
+            'assignment': instance.assignment,
+            'score': instance.score,
+            'submitted_on': instance.submitted_on,
+            'questions': []
+        }
+
+        for question in questions:
+            student_answer = answers.filter(question=question).first()
+            assignment_data['questions'].append({
+                'question_text': question.text,
+                'correct_answer': question.correct_option,
+                'student_answer': student_answer.answer_text if student_answer else 'Not answered',
+                'is_correct': student_answer.is_correct if student_answer else False,
+            })
+
+        assignments_data.append(assignment_data)
+
+    return render(request, 'novae_app/assignment_results.html', {'assignments_data': assignments_data})
+
+
 
