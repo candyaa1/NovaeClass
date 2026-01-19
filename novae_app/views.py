@@ -641,3 +641,8 @@ def student_assignment_retake(request, instance_id):
     instance.start_retake()
     return redirect('student_assignment_detail', instance_id=instance.id)
 
+
+def billing_view(request):
+    # Example: render a billing page template
+    return render(request, 'billing.html')
+
