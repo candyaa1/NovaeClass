@@ -590,3 +590,52 @@ class ParentSignUpForm(forms.Form):
         widget=forms.PasswordInput(attrs={'placeholder': 'Password'})
     )
 
+class ChildForm(forms.Form):
+    """Form for adding a child account."""
+    username = forms.CharField(
+        max_length=150,
+        label="Child Username",
+        widget=forms.TextInput(attrs={'placeholder': 'Child Username'})
+    )
+    grade_choices = [
+        ('K', 'K'),
+        ('1st', '1st'),
+        ('2nd', '2nd'),
+        ('3rd', '3rd'),
+        ('4th', '4th'),
+        ('5th', '5th'),
+        ('6th', '6th'),
+        ('7th', '7th'),
+        ('8th', '8th'),
+        ('9th', '9th'),
+        ('10th', '10th'),
+        ('11th', '11th'),
+        ('12th', '12th'),
+    ]
+    grade = forms.ChoiceField(
+        choices=grade_choices,
+        label="Grade"
+    )
+    password = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput(attrs={'placeholder': 'Password'})
+    )
+
+
+# Formset to allow adding multiple children
+ChildFormSet = formset_factory(ChildForm, extra=1)
+
+@login_required
+def student_assignment_retake(request, instance_id):
+    """
+    Allow a student to retake an assignment if retake is allowed.
+    """
+    student = request.user.student_profile
+    instance = get_object_or_404(AssignmentInstance, id=instance_id, student=student)
+
+    if not instance.retake_allowed():
+        return redirect('student_assignments')
+
+    instance.start_retake()
+    return redirect('student_assignment_detail', instance_id=instance.id)
+
