@@ -1,36 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Billing & Subscription</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 30px;
-        }
-        h2 {
-            margin-top: 40px;
-        }
-        .assignment {
-            padding: 10px;
-            margin-bottom: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            font-size: 12px;
-            border-radius: 4px;
-            margin-left: 6px;
-            color: white;
-        }
-        .demo { background-color: #007bff; }
-        .sample { background-color: #28a745; }
-    </style>
-</head>
-
-<body>
-
 <h1>Billing & Subscription</h1>
 
 <p><strong>Current Plan:</strong> {{ current_plan }}</p>
@@ -40,20 +7,21 @@
 <h2>What’s Included in Your Free Trial</h2>
 
 {% if free_trial_assignments %}
-    {% for assignment in free_trial_assignments %}
-        <div class="assignment">
-            <strong>{{ assignment.title }}</strong><br>
-            Course: {{ assignment.course.title }}<br>
+    <ul>
+        {% for assignment in free_trial_assignments %}
+            <li style="margin-bottom: 8px;">
+                <a href="{% url 'assignment_preview' assignment.id %}">
+                    {{ assignment.title }}
+                </a>
 
-            {% if assignment.is_demo %}
-                <span class="badge demo">Demo</span>
-            {% endif %}
-
-            {% if assignment.is_sample %}
-                <span class="badge sample">Sample</span>
-            {% endif %}
-        </div>
-    {% endfor %}
+                {% if assignment.is_demo %}
+                    <span style="color: green;">(Demo)</span>
+                {% elif assignment.is_sample %}
+                    <span style="color: blue;">(Sample)</span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
 {% else %}
     <p>No free trial content available yet.</p>
 {% endif %}
@@ -61,8 +29,12 @@
 <hr>
 
 <h2>Upgrade Your Plan</h2>
-<p>Unlock full access to all assignments, courses, and progress tracking.</p>
-<button disabled>Upgrade (Coming Soon)</button>
 
-</body>
-</html>
+<p>
+    Unlock full access to all assignments, courses, progress tracking,
+    and detailed reports.
+</p>
+
+<button disabled style="opacity: 0.6;">
+    Upgrade (Coming Soon)
+</button>
