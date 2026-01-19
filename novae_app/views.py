@@ -337,13 +337,18 @@ def get_grades(request, child_id):
         student = StudentProfile.objects.get(user__id=child_id)
     except StudentProfile.DoesNotExist:
         return JsonResponse({"error": "Student not found"}, status=404)
+    
     grades = AssignmentInstance.objects.filter(student=student, score__isnull=False)
+    
     grades_data = [{
         'assignment': g.assignment.title,
         'score': g.score,
         'comments': g.feedback or 'No feedback available',
     } for g in grades]
+    
     return JsonResponse({'grades': grades_data})
+
+
 @login_required
 def parent_submitted_assignments(request, student_id):
     parent = request.user.parent_profile
