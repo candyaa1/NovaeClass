@@ -386,10 +386,10 @@ def student_signup(request):
         parent_form = ParentSignUpForm()
         child_formset = ChildFormSet()
 
-    return render(request, "novae_class/student_signup.html", {
-        'parent_form': parent_form,
-        'child_formset': child_formset,
-    })
+    return render(request, "student_signup/student_signup.html", {
+      'parent_form': parent_form,
+      'child_formset': child_formset,
+})
 
     
 def submit_assignment(request, assignment_id):
