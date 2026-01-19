@@ -673,27 +673,19 @@ def billing_view(request):
     )
 
 
-
-@login_required
 def assignment_preview(request, assignment_id):
+    assignment = get_object_or_404(Assignment, pk=assignment_id)
 
-    assignment = get_object_or_404(
-        Assignment.objects.prefetch_related(
-            "questions",
-        ),
-        id=assignment_id
-    )
+    # Get related questions
+    questions = assignment.questions.prefetch_related('choice_set')  # prefetch choices
 
-    if not assignment.is_demo and not assignment.is_sample:
-        return render(request, "upgrade_required.html")
+    # Get materials if field exists
+    materials = getattr(assignment, 'materials', None)
+    if materials:
+        materials = assignment.materials.all()
 
-    return render(
-        request,
-        "assignment_preview.html",
-        {
-            "assignment": assignment,
-            "questions": assignment.questions.all(),
-            "materials": assignment.materials.all(),
-            "games": assignment.games.all(),
-        }
-    )
+    return render(request, 'assignment_preview.html', {
+        'assignment': assignment,
+        'questions': questions,
+        'materials': materials,
+    })
