@@ -157,11 +157,15 @@ class ParentProfile(models.Model):
 # ---------------------------
 # Assignment
 # ---------------------------
+
+
 class Assignment(models.Model):
     course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
-        related_name="assignments"
+        related_name="assignments",
+        null=False,      # must belong to a course
+        blank=False
     )
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -172,12 +176,14 @@ class Assignment(models.Model):
         blank=True,
         null=True
     )
-    # ✅ New fields
+
+    # ✅ New fields for free trial / sample
     is_demo = models.BooleanField(default=False)
     is_sample = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
+
 # ---------------------------
 # Assignment Instance
 # ---------------------------
