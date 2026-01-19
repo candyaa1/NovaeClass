@@ -49,20 +49,23 @@ class ParentProfileAdmin(admin.ModelAdmin):
 # Assignment admin form
 # ---------------------------
 class AssignmentAdminForm(forms.ModelForm):
-    """
-    Form allows admin to assign an assignment to a grade.
-    """
-    grade_level = forms.ChoiceField(
-        choices=[('', '--- Select Grade ---')] + list(Assignment._meta.get_field('grade_level').choices),
-        required=False,
-        help_text="Select grade to auto-assign this assignment to all students in that grade."
-    )
-
     class Meta:
         model = Assignment
-        fields = ['title', 'description', 'due_date','grade_level']
+        fields = '__all__'
 
-
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # Automatically assign "Free Trial" course for demo/sample
+        if instance.is_demo or instance.is_sample:
+            try:
+                free_course = Course.objects.get(title="Free Trial")
+                instance.course = free_course
+            except Course.DoesNotExist:
+                # fallback: pick any course if Free Trial doesn't exist
+                instance.course = Course.objects.first()
+        if commit:
+            instance.save()
+        return instance
 # ---------------------------
 # Assignment admin
 class QuestionInline(admin.TabularInline):
@@ -76,29 +79,22 @@ class AssignmentAdmin(ImportExportModelAdmin):
     form = AssignmentAdminForm
     list_display = (
         'title',
-        'course',     # ✅ show course to avoid confusion
         'grade_level',
         'due_date',
         'is_demo',
         'is_sample',
     )
     list_filter = (
-        'course',     # ✅ filter by course
         'grade_level',
         'due_date',
         'is_demo',
         'is_sample',
     )
-    search_fields = ('title', 'description')
+    search_fields = ('title',)
     inlines = [QuestionInline]
 
     def save_model(self, request, obj, form, change):
-        """
-        Save the assignment.
-        Auto-assign to students handled by signals.
-        """
         super().save_model(request, obj, form, change)
-
 # ---------------------------
 # AssignmentInstance admin
 # ---------------------------
