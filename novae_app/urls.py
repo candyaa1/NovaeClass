@@ -75,5 +75,7 @@ urlpatterns = [
     # Ensure these URLs are set correctly in your urls.py
     path('get-grades/<int:child_id>/', views.get_grades, name='get_grades'),
     path('assignment-results/<str:child_name>/', views.assignment_results, name='assignment_results'),
+    path('billing/', views.billing_view, name='billing'),
+
 ]
 
