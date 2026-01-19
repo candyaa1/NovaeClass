@@ -159,6 +159,15 @@ class ParentProfile(models.Model):
 # ---------------------------
 
 
+
+class Course(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.title
+
+
 class Assignment(models.Model):
     course = models.ForeignKey(
         Course,
@@ -183,6 +192,7 @@ class Assignment(models.Model):
 
     def __str__(self):
         return self.title
+
 
 # ---------------------------
 # Assignment Instance
