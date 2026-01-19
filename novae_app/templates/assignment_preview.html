@@ -2,13 +2,28 @@
 
 <p>{{ assignment.description }}</p>
 
+{% if materials %}
 <hr>
+<h3>Materials</h3>
+<ul>
+  {% for material in materials %}
+    <li>
+      {% if material.file %}
+        <a href="{{ material.file.url }}">{{ material.title }}</a>
+      {% else %}
+        {{ material.title }}
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+{% endif %}
 
+<hr>
 <h3>Preview Questions</h3>
 
 {% for question in questions %}
   <div class="question">
-    <p><strong>{{ forloop.counter }}. {{ question.text }}</strong></p>
+    <p>{{ forloop.counter }}. {{ question.text }}</p>
 
     {% if question.choice_set.all %}
       <ul>
@@ -16,8 +31,6 @@
           <li>{{ choice.text }}</li>
         {% endfor %}
       </ul>
-    {% else %}
-      <p><em>No choices for this question.</em></p>
     {% endif %}
   </div>
 {% empty %}
@@ -25,7 +38,6 @@
 {% endfor %}
 
 <hr>
-
 <p style="color: gray;">
   This is a free preview. Upgrade to unlock full access.
 </p>
