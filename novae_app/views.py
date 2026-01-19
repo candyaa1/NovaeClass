@@ -676,22 +676,14 @@ def billing_view(request):
 
 @login_required
 def assignment_preview(request, assignment_id):
-    """
-    Read-only preview for demo/sample assignments.
-    Pulls ALL related content.
-    """
 
     assignment = get_object_or_404(
         Assignment.objects.prefetch_related(
             "questions",
-            "questions__choices",
-            "materials",
-            "games",
         ),
         id=assignment_id
     )
 
-    # 🚫 Block paid content
     if not assignment.is_demo and not assignment.is_sample:
         return render(request, "upgrade_required.html")
 
