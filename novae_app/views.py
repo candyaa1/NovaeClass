@@ -519,3 +519,9 @@ class ParentLoginView(LoginView):
 
     def get_success_url(self):
         return '/parent/dashboard/'
+
+@login_required
+def achievements(request):
+    """Render the achievements page for the logged-in user."""
+    return render(request, 'novae_app/achievements.html')
+
