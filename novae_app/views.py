@@ -574,4 +574,22 @@ def assignment_results(request, child_name):
     return render(request, 'novae_app/assignment_results.html', {'assignments_data': assignments_data})
 
 
+@login_required
+def get_grades(request, child_id):
+    try:
+        student = StudentProfile.objects.get(user__id=child_id)
+    except StudentProfile.DoesNotExist:
+        return JsonResponse({"error": "Student not found"}, status=404)
+
+    grades = AssignmentInstance.objects.filter(student=student, score__isnull=False)
+    grades_data = []
+
+    for grade in grades:
+        grades_data.append({
+            'assignment': grade.assignment.title,
+            'score': grade.score,
+            'comments': grade.feedback if grade.feedback else 'No feedback available',
+        })
+
+    return JsonResponse({'grades': grades_data})
 
