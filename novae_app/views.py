@@ -40,7 +40,7 @@ def user_is_paid(user):
 # ---------------------------
 # LANDING PAGE
 # ---------------------------
-def landing_page(request):
+def landing(request):
     return render(request, 'novae_app/landing.html')
 
 
