@@ -11,7 +11,7 @@ from .views import coming_soon
 #
 # Simple redirect view for the homepage
 def home_redirect(request):
-    return redirect('coming_soon')  # Redirect to the signup page
+    return redirect('landing')  # Redirect to the signup page
 urlpatterns = [
     # ---------------------------
     # Landing & Logout
