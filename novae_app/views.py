@@ -642,7 +642,24 @@ def student_assignment_retake(request, instance_id):
     return redirect('student_assignment_detail', instance_id=instance.id)
 
 
-def billing_view(request):
-    # Example: render a billing page template
-    return render(request, 'novae_app/billing.html')
+# novae_app/views.py
+from django.shortcuts import render
+from .models import BillingProfile, Course, Material
 
+def billing_view(request):
+    user = request.user
+    billing_profile = None
+    free_trial_items = []
+
+    if hasattr(user, 'billingprofile'):
+        billing_profile = user.billingprofile
+        # If the user is on a free trial, show free trial items
+        if billing_profile.plan == 'free_trial':
+            # Example: show free courses or free materials
+            free_trial_items = Course.objects.filter(is_demo=True) | Material.objects.filter(is_demo=True)
+
+    context = {
+        'billing_profile': billing_profile,
+        'free_trial_items': free_trial_items,
+    }
+    return render(request, 'novae_app/billing.html', context)
