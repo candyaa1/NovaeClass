@@ -1,40 +1,68 @@
-{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Billing & Subscription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        h2 {
+            margin-top: 40px;
+        }
+        .assignment {
+            padding: 10px;
+            margin-bottom: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            margin-left: 6px;
+            color: white;
+        }
+        .demo { background-color: #007bff; }
+        .sample { background-color: #28a745; }
+    </style>
+</head>
+
+<body>
+
 <h1>Billing & Subscription</h1>
-<p>Welcome to the billing page. Here you can manage your subscription, view invoices, and update your payment information.</p>
 
-<h2>Subscription Plan</h2>
-<p>Current Plan: {{ billing_profile.plan|default:"Free Trial" }}</p>
+<p><strong>Current Plan:</strong> {{ current_plan }}</p>
 
-{% if billing_profile.plan == "free_trial" %}
-<h3>Free Trial Items</h3>
-<ul>
-    {% for item in free_trial_items %}
-        <li>{{ item.name }}</li>
-    {% empty %}
-        <li>No free trial items available.</li>
+<hr>
+
+<h2>What’s Included in Your Free Trial</h2>
+
+{% if free_trial_assignments %}
+    {% for assignment in free_trial_assignments %}
+        <div class="assignment">
+            <strong>{{ assignment.title }}</strong><br>
+            Course: {{ assignment.course.title }}<br>
+
+            {% if assignment.is_demo %}
+                <span class="badge demo">Demo</span>
+            {% endif %}
+
+            {% if assignment.is_sample %}
+                <span class="badge sample">Sample</span>
+            {% endif %}
+        </div>
     {% endfor %}
-</ul>
-{% endif %}
-
-<h3>Upgrade Plan</h3>
-<p><a href="#">Upgrade your subscription</a></p>
-
-<h3>Payment Information</h3>
-{% if billing_profile.payment_method %}
-    <p>{{ billing_profile.payment_method }}</p>
 {% else %}
-    <p>No payment method added yet.</p>
-    <a href="#">Add Payment Method</a>
+    <p>No free trial content available yet.</p>
 {% endif %}
 
-<h3>Invoices</h3>
-{% if billing_profile.invoices.exists %}
-    <ul>
-        {% for invoice in billing_profile.invoices.all %}
-            <li>{{ invoice.date }} - ${{ invoice.amount }}</li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>You have no invoices yet.</p>
-{% endif %}
-{% endblock %}
+<hr>
+
+<h2>Upgrade Your Plan</h2>
+<p>Unlock full access to all assignments, courses, and progress tracking.</p>
+<button disabled>Upgrade (Coming Soon)</button>
+
+</body>
+</html>
