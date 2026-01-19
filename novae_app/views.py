@@ -461,20 +461,61 @@ def study_plan_delete(request, pk):
 
 
 @login_required
-def download_graded_assignment_docx(request, pk):
-    assignment = get_object_or_404(Assignment, pk=pk, user=request.user)
-    
-    # Make sure it has been graded
-    if not assignment.graded_file:
-        return HttpResponse("Assignment not graded yet.", status=404)
-    
+def download_assignment_docx(request, pk):
+    assignment = get_object_or_404(Assignment, id=pk)
+
     doc = Document()
-    doc.add_heading(f"Graded Assignment: {assignment.title}", 0)
-    doc.add_paragraph(assignment.feedback or "No feedback provided")
-    
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-    response['Content-Disposition'] = f'attachment; filename=graded_{assignment.title}.docx'
+    doc.add_heading(assignment.title, level=1)
+    doc.add_paragraph(f"Due Date: {assignment.due_date}")
+    doc.add_paragraph("Description:")
+    doc.add_paragraph(assignment.description or "No description provided.")
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    )
+    response['Content-Disposition'] = f'attachment; filename="{assignment.title}.docx"'
     doc.save(response)
-    
     return response
 
+
+# ---------------------------
+# DOWNLOAD GRADED ASSIGNMENT DOCX
+# ---------------------------
+@login_required
+def download_graded_assignment_docx(request, instance_id):
+    instance = get_object_or_404(AssignmentInstance, id=instance_id)
+
+    doc = Document()
+    doc.add_heading(f"{instance.assignment.title} - Graded Review", level=1)
+    doc.add_paragraph(f"Due Date: {instance.assignment.due_date}")
+    doc.add_paragraph(f"Score: {instance.score or 'Not graded yet'}")
+    doc.add_paragraph("Description:")
+    doc.add_paragraph(instance.assignment.description or "No description provided.")
+    doc.add_paragraph("Feedback:")
+    doc.add_paragraph(instance.feedback or "No feedback provided.")
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    )
+    filename = f"{instance.assignment.title}_graded_review.docx"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    doc.save(response)
+    return response
+
+
+# ---------------------------
+# PARENT LOGIN VIEW
+# ---------------------------
+class ParentLoginView(LoginView):
+    template_name = 'novae_app/parent_login.html'
+
+    def form_valid(self, form):
+        user = form.get_user()
+        # Make sure the user is a parent
+        if user.is_authenticated and hasattr(user, 'is_parent') and user.is_parent():
+            return super().form_valid(form)
+        form.add_error(None, "You must log in as a parent.")
+        return self.form_invalid(form)
+
+    def get_success_url(self):
+        return '/parent/dashboard/'
